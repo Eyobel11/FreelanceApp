@@ -172,7 +172,7 @@ const DashboardFreelancer = () => {
             <div>
               <p className="text-sm font-medium">{user.name}</p>
               <p className="text-xs text-gray-400">{user.role}</p>
-              <Link to="/dashboardDash/freelancer/viewprofile" className="text-xs text-blue-400">
+              <Link to={`/dashboardDash/freelancer/setprofile/${user._id}`} className="text-xs text-blue-400">
                 View Profile
               </Link>
             </div>

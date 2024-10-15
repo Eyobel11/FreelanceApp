@@ -1,29 +1,47 @@
-import React, { useState } from 'react';
-import { FaEdit, FaTrashAlt, FaRegCalendarAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import axios from '../utils/axios'; // Make sure axios is properly configured
+import { FaEdit, FaTrashAlt, FaRegCalendarAlt, FaEye } from 'react-icons/fa'; // Import FaEye for the view icon
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 const MyJobs = () => {
-  const [services, setServices] = useState([
-    {
-      id: 1,
-      title: "I'll create an eCommerce Website for You",
-      category: "Design & Creative",
-      created: "October 18, 2023",
-      expired: "November 17, 2023",
-      cost: "$350.00",
-      duration: "7 Days",
-      status: "Published",
-      queue: 2,
-    },
-    // More services can go here
-  ]);
-
+  const [services, setServices] = useState([]);
   const [sortBy, setSortBy] = useState('Newest');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Fetch jobs from the backend
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await axios.get('/jobpost'); // Make sure the endpoint is correct
+        setServices(response.data);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   // Filter services by search term
   const filteredServices = services.filter(service =>
     service.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleDelete = async (jobId) => {
+    if (!jobId) {
+      console.error('Job ID is undefined');
+      return;
+    }
+
+    try {
+      await axios.delete(`/jobpost/${jobId}`); // Make sure the endpoint is correct
+      // Update state to remove the deleted job
+      setServices((prevServices) => prevServices.filter(service => service._id !== jobId));
+      console.log('Job deleted successfully');
+    } catch (error) {
+      console.error('Error deleting job:', error);
+    }
+  };
 
   return (
     <div className="my-service p-4 lg:p-10">
@@ -45,7 +63,7 @@ const MyJobs = () => {
         >
           <option value="Newest">Newest</option>
           <option value="Oldest">Oldest</option>
-          <option value="Cost">Cost</option>
+          
           {/* Add more sorting options if needed */}
         </select>
       </div>
@@ -56,43 +74,45 @@ const MyJobs = () => {
           <thead>
             <tr className="border-b">
               <th className="py-2 px-4 text-left">Title</th>
-              <th className="py-2 px-4">Expired</th>
-              <th className="py-2 px-4">Cost/Type</th>
-              <th className="py-2 px-4">Status</th>
-              <th className="py-2 px-4">In Queue</th>
+              <th className="py-2 px-4">Created Date</th>
+              <th className="py-2 px-4">Duration</th>
+              <th className="py-2 px-4">Job Type</th>
+              <th className="py-2 px-4">Location</th>
               <th className="py-2 px-4">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredServices.map(service => (
-              <tr key={service.id} className="border-b">
+              <tr key={service._id} className="border-b">
                 <td className="py-2 px-4">
                   <div className="flex flex-col">
                     <span>{service.title}</span>
                     <div className="flex items-center text-sm text-gray-500">
                       <FaRegCalendarAlt className="mr-2" />
                       <span>{service.category}</span>
-                      <span className="ml-2">{service.created}</span>
                     </div>
                   </div>
                 </td>
-                <td className="py-2 px-4 text-red-500">{service.expired}</td>
-                <td className="py-2 px-4">{service.cost} <br /> {service.duration}</td>
+                <td className="py-2 px-4 text-gray-600">{new Date(service.createdAt).toLocaleDateString()}</td>
+                <td className="py-2 px-4"> {service.duration}</td>
                 <td className="py-2 px-4">
-                  <span className={`px-2 py-1 rounded ${service.status === 'Published' ? 'bg-blue-200 text-blue-800' : 'bg-gray-200 text-gray-800'}`}>
-                    {service.status}
+                  <span className={`px-2 py-1 rounded text-blue-800 `}>
+                    {service.jobType}
                   </span>
                 </td>
-                <td className="py-2 px-4">
-                  <button className="bg-green-500 text-white px-4 py-1 rounded-full">
-                    View in Queue ({service.queue})
-                  </button>
+                <td className="py-2 px-4 rounded-full ">
+                  <p className="text-green-500">
+                    {service.location}
+                  </p>
                 </td>
-                <td className="py-2 px-4">
-                  <button className="text-yellow-500 mx-2">
+                <td className="py-2 px-4 flex items-center">
+                  <Link to={`/dashboardDash/client/job/${service._id}`} className="text-blue-500 mx-2">
+                    <FaEye /> {/* View details icon */}
+                  </Link>
+                  <Link to={`/dashboardDash/client/editjob/${service._id}`}  className="text-yellow-500 mx-2">
                     <FaEdit />
-                  </button>
-                  <button className="text-red-500 mx-2">
+                  </Link>
+                  <button onClick={() => handleDelete(service._id)} className="text-red-500 mx-2">
                     <FaTrashAlt />
                   </button>
                 </td>
@@ -106,3 +126,4 @@ const MyJobs = () => {
 };
 
 export default MyJobs;
+

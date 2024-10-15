@@ -1,63 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
+import axios from '../utils/axios'; // Make sure you have axios configured for API calls
+import { useParams } from 'react-router-dom';  // To get userId from URL
+import { useSelector } from 'react-redux';  // To get userId from Redux
 
 const ClientProfile = () => {
+
+
+
+  // const { userId: paramUserId } = useParams();  // Get userId from route params
+  const userId = useSelector((state) => state.auth.userId);  // Get userId from Redux
+  // const userId = reduxUserId;  // Use paramUserId if it exists, else use reduxUserId
+
+
   const [description, setDescription] = useState('');
-  const [profileImage, setProfileImage] = useState(null);
+  const [profilePicture, setprofilePicture] = useState(null);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
-
   const [category, setCategory] = useState('');
   const [friendlyAddress, setFriendlyAddress] = useState('');
   const [gallery, setGallery] = useState(null);
- 
   const [videoUrl, setVideoUrl] = useState('');
-  const [profileShow, setProfileShow] = useState('');
+  const [profileShow, setProfileShow] = useState('show');
   const [website, setWebsite] = useState('');
   const [foundedDate, setFoundedDate] = useState('');
-  const [employees , setEmployees] = useState('')
+  const [employees, setEmployees] = useState('');
   const [responseTime, setResponseTime] = useState('');
- 
+
+  // Fetch profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { data } = await axios.get(`/clientprofile/${userId}`); // Endpoint to fetch the logged-in user's profile
+        setFullName(data.fullName);
+        setEmail(data.email);
+        setPhone(data.phone);
+        setLocation(data.location);
+        setDescription(data.description);
+        setCategory(data.category);
+        setFriendlyAddress(data.friendlyAddress);
+        setVideoUrl(data.videoUrl);
+        setProfileShow(data.profileShow);
+        setWebsite(data.website);
+        setFoundedDate(data.foundedDate);
+        setEmployees(data.employees);
+        setResponseTime(data.responseTime);
+        setprofilePicture(data.profilePicture);
+        setGallery(data.gallery)
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+      if(userId){
+        fetchProfile();
+      }
+    
+  }, [userId]);
 
   const handleEditorChange = (content) => {
     setDescription(content);
   };
 
-//   const handleAddField = (setState, state) => {
-//     setState([...state, { id: state.length + 1, value: '' }]);
-//   };
+  const handleSaveProfile = async () => {
+    const formData = new FormData();
+    formData.append('profilePicture', profilePicture); // 'profilePicture' matches the backend schema
+    formData.append('fullName', fullName);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('location', location);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('friendlyAddress', friendlyAddress);
+    formData.append('gallery', gallery);
+    formData.append('videoUrl', videoUrl);
+    formData.append('profileShow', profileShow);
+    formData.append('website', website);
+    formData.append('foundedDate', foundedDate);
+    formData.append('employees', employees);
+    formData.append('responseTime', responseTime);
 
-//   const handleRemoveField = (id, setState, state) => {
-//     setState(state.filter((item) => item.id !== id));
-//   };
-
-  const handleSaveProfile = () => {
-    const profileData = {
-      profileImage,
-      fullName,
-      email,
-      phone,
-      location,
-    
-
-      description,
-      gallery,
-
-      videoUrl,
-
-      category,
-      friendlyAddress,
-
-
-      profileShow,
-      website,
-      foundedDate,
-      employees , 
-      responseTime
-    };
-    console.log('Profile Data:', profileData);
+    try {
+      const response = await axios.post('/clientprofile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      console.log('Profile saved successfully:', response.data);
+    } catch (error) {
+      console.error('Error saving profile:', error.response?.data || error.message);
+    }
   };
 
   return (
@@ -67,27 +100,20 @@ const ClientProfile = () => {
       {/* Profile Image */}
       <div className="mb-6">
         <label className="block text-lg font-semibold mb-2">Profile Image</label>
-        <input type="file" onChange={(e) => setProfileImage(e.target.files[0])} className="block w-full" />
+        <input type="file" onChange={(e) => setprofilePicture(e.target.files[0])} className="block w-full" />
       </div>
 
-      {/* Full Name */}
-      
-
-      {/* Gender, Date of Birth */}
-
-
-      {/* Email, Phone */}
+      {/* Full Name, Email, Phone */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-
-      <div >
-        <label className="block text-lg font-semibold mb-2">Full Name</label>
-        <input
-          type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-md"
-        />
-      </div>
+        <div>
+          <label className="block text-lg font-semibold mb-2">Full Name</label>
+          <input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
         <div>
           <label className="block text-lg font-semibold mb-2">Email</label>
           <input
@@ -106,18 +132,18 @@ const ClientProfile = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
-        <div className="mb-6">
-        <label className="block text-lg font-semibold mb-2">Response Time</label>
-        <input
-          type="text"
-          value={responseTime}
-          onChange={(e) => setResponseTime(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-md"
-        />
-      </div>
+        <div>
+          <label className="block text-lg font-semibold mb-2">Response Time</label>
+          <input
+            type="text"
+            value={responseTime}
+            onChange={(e) => setResponseTime(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
       </div>
 
-      {/* Freelancer Type, Category */}
+      {/* Show Profile, Category */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-lg font-semibold mb-2">Show my Profile</label>
@@ -126,7 +152,6 @@ const ClientProfile = () => {
             onChange={(e) => setProfileShow(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-md"
           >
-            <option value="">Select profile</option>
             <option value="show">Show</option>
             <option value="hide">Hide</option>
           </select>
@@ -138,7 +163,6 @@ const ClientProfile = () => {
             onChange={(e) => setCategory(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-md"
           >
-            <option value="">Select Category</option>
             <option value="business">Business</option>
             <option value="designer">Designer</option>
             <option value="digital-marketing">Digital Marketing</option>
@@ -151,7 +175,7 @@ const ClientProfile = () => {
         </div>
       </div>
 
-      {/* website ,  */}
+      {/* Website, Founded Date, Employees, Location */}
       <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
         <div>
           <label className="block text-lg font-semibold mb-2">Website</label>
@@ -191,24 +215,22 @@ const ClientProfile = () => {
         </div>
       </div>
 
-      {/* Location and Friendly Address */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <div>
-          <label className="block text-lg font-semibold mb-2">Friendly Address</label>
-          <input
-            type="text"
-            value={friendlyAddress}
-            onChange={(e) => setFriendlyAddress(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
+      {/* Friendly Address */}
+      <div className="mb-6">
+        <label className="block text-lg font-semibold mb-2">Friendly Address</label>
+        <input
+          type="text"
+          value={friendlyAddress}
+          onChange={(e) => setFriendlyAddress(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md"
+        />
       </div>
 
       {/* Description */}
       <div className="mb-6">
         <label className="block text-lg font-semibold mb-2">Description</label>
         <Editor
+          apiKey='65gcyx9y0yezfpmk2p7xn336dpzjwn2walh2cekmrxk5o9k7'
           value={description}
           init={{
             height: 300,
@@ -219,9 +241,9 @@ const ClientProfile = () => {
               'insertdatetime media table paste code help wordcount',
             ],
             toolbar:
-              'undo redo | formatselect | bold italic backcolor | \
-                alignleft aligncenter alignright alignjustify | \
-                bullist numlist outdent indent | removeformat | help',
+              'undo redo | formatselect | bold italic backcolor | ' +
+              'alignleft aligncenter alignright alignjustify | ' +
+              'bullist numlist outdent indent | removeformat | help',
           }}
           onEditorChange={handleEditorChange}
         />
@@ -229,7 +251,7 @@ const ClientProfile = () => {
 
       {/* Media Upload */}
       <div className="mb-6">
-        <label className="block text-lg font-semibold mb-2">Media</label>
+        <label className="block text-lg font-semibold mb-2">Gallery Image</label>
         <input type="file" onChange={(e) => setGallery(e.target.files[0])} className="block w-full" />
       </div>
 
@@ -243,8 +265,6 @@ const ClientProfile = () => {
         />
       </div>
 
-      {/* Awards, Skills, FAQ */}
-      
       {/* Save Button */}
       <button
         onClick={handleSaveProfile}

@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-import axios from '../utils/axios'; // Import Axios for API call
+import axios from '../utils/axios'; // Import Axios for API calls
+import { useParams, useNavigate } from 'react-router-dom'; // For route navigation
 
-function PostNewService() {
+const EditServicePost = () => {
+  const { serviceId } = useParams(); // Get serviceId from the route params
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -12,6 +16,29 @@ function PostNewService() {
   const [englishLevel, setEnglishLevel] = useState('');
   const [featuredImage, setFeaturedImage] = useState(null);
   const [gallery, setGallery] = useState([]);
+
+  // Fetch the existing service data
+  useEffect(() => {
+    const fetchService = async () => {
+      if (!serviceId) return;
+
+      try {
+        const response = await axios.get(`/servicepost/${serviceId}`);
+        const service = response.data;
+        setTitle(service.title);
+        setCategory(service.category);
+        setDeliveryTime(service.deliveryTime);
+        setResponseTime(service.responseTime);
+        setServicePrice(service.servicePrice);
+        setEnglishLevel(service.englishLevel);
+        setDescription(service.description);
+      } catch (error) {
+        console.error('Error fetching service data:', error);
+      }
+    };
+
+    fetchService();
+  }, [serviceId]);
 
   const handleEditorChange = (content) => {
     setDescription(content);
@@ -27,8 +54,8 @@ function PostNewService() {
     setGallery([...e.target.files]);
   };
 
-  // Handle form submission
-  const handleSubmit = async () => {
+  // Handle form submission for updating the service post
+  const handleUpdateService = async () => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('category', category);
@@ -38,7 +65,7 @@ function PostNewService() {
     formData.append('englishLevel', englishLevel);
     formData.append('description', description);
 
-    // Append files
+    // Append files if they exist
     if (featuredImage) {
       formData.append('featuredImage', featuredImage);
     }
@@ -49,23 +76,25 @@ function PostNewService() {
     }
 
     try {
-      const response = await axios.post('/servicepost', formData, {
+      await axios.put(`/servicepost/${serviceId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log('Service posted successfully:', response.data);
-      // Optionally reset the form or display a success message
+      console.log('Service updated successfully');
+      navigate('/dashboardDash/freelancer/myservice'); // Redirect to My Services after updating
     } catch (error) {
-      console.error('Error posting service:', error.response?.data || error.message);
+      console.error('Error updating service:', error);
     }
   };
 
   return (
     <div className="p-4 md:p-8">
+      <h2 className="text-2xl font-semibold mb-4">Edit Service</h2>
+      
       {/* General Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Post a New Service</h2>
+        <h2 className="text-xl font-semibold mb-4">Service Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
             <label className="block mb-2 font-medium">Title</label>
@@ -74,7 +103,6 @@ function PostNewService() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-              placeholder="Service title..."
             />
           </div>
           <div>
@@ -86,16 +114,15 @@ function PostNewService() {
             >
               <option value="">Select Category</option>
               <option value="programming-tech">Programming & Tech</option>
-              <option value="graphic-and-design">Graphics & Design</option>
+              <option value="graphic-design">Graphic Design</option>
               <option value="content-writing">Writing & Translation</option>
               <option value="digital-marketing">Digital Marketing</option>
               <option value="business">Business</option>
               <option value="lifestyle">Lifestyle</option>
               <option value="music-audio">Music & Audio</option>
               <option value="video-animation">Video & Animation</option>
-              <option value="video-animation">Development & IT</option>
-              <option value="finance-and-accounting">Finance & Accounting</option>
-
+              <option value="development-it">Development & IT</option>
+              <option value="finance-accounting">Finance & Accounting</option>
             </select>
           </div>
           <div>
@@ -115,13 +142,12 @@ function PostNewService() {
               onChange={(e) => setResponseTime(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
             >
-              <option value="">Select Category</option>
+              <option value="">Select Response Time</option>
               <option>1 Hour</option>
               <option>2 Hours</option>
               <option>3 Hours</option>
               <option>4 Hours</option>
               <option>5 Hours</option>
-              <option>6 Hours</option>
             </select>
           </div>
           <div>
@@ -141,7 +167,7 @@ function PostNewService() {
               onChange={(e) => setEnglishLevel(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
             >
-              <option value="">Select Category</option>
+              <option value="">Select English Level</option>
               <option value="fluent">Fluent</option>
               <option value="intermediate">Intermediate</option>
               <option value="basic">Basic</option>
@@ -166,7 +192,7 @@ function PostNewService() {
           />
         </div>
       </div>
-
+      
       {/* Media Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Media</h2>
@@ -182,17 +208,14 @@ function PostNewService() {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex">
-        <button
-          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
-          onClick={handleSubmit}
-        >
-          Submit & Preview
-        </button>
-      </div>
+      <button
+        onClick={handleUpdateService}
+        className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+      >
+        Update Service
+      </button>
     </div>
   );
-}
+};
 
-export default PostNewService;
+export default EditServicePost;

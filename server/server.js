@@ -15,6 +15,7 @@ const app = express();
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads/profile-pictures');
 const uploadDirs = path.join(__dirname, 'uploads/attachments');
+const uploadDirJob = path.join(__dirname, 'uploads/job-images');
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -24,6 +25,12 @@ if (!fs.existsSync(uploadDir)) {
 if (!fs.existsSync(uploadDirs)) {
   fs.mkdirSync(uploadDirs, { recursive: true });
   console.log('Uploads attachments directory created:', uploadDirs);
+}
+
+
+if (!fs.existsSync(uploadDirJob)) {
+  fs.mkdirSync(uploadDirJob, { recursive: true });
+  console.log('Uploads attachments directory created:', uploadDirJob);
 }
 
 // Middleware
@@ -81,10 +88,15 @@ const profileRoutes = require('./routes/profileRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
-
+const clientprofileRoutes = require('./routes/clientProfileRoutes');
+const jobPostRoutes = require('./routes/jobPostRoutes');
+const freelancerprofileRoutes = require('./routes/freelancerProfileRoutes');
+const servicePostRoutes = require('./routes/servicePostRoutes')
 
 // Routes middleware
 app.use('/api/profile', profileRoutes);
+app.use('/api/clientprofile', clientprofileRoutes);
+app.use('/api/freelancerprofile', freelancerprofileRoutes)
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
@@ -94,6 +106,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/jobpost', jobPostRoutes);
+app.use('/api/servicepost', servicePostRoutes);
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({

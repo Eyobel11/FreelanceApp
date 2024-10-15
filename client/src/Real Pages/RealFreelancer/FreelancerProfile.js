@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
+import axios from '../utils/axios'; // Make sure you have axios configured for API calls
+import { useParams } from 'react-router-dom';  // To get userId from URL
+import { useSelector } from 'react-redux';  // To get userId from Redux
 
 const FreelancerProfile = () => {
+
+  const userId = useSelector((state) => state.auth.userId);  // Get userId from Redux
+
+
   const [description, setDescription] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [fullName, setFullName] = useState('');
@@ -16,12 +23,44 @@ const FreelancerProfile = () => {
   const [freelancerType, setFreelancerType] = useState('');
   const [category, setCategory] = useState('');
   const [friendlyAddress, setFriendlyAddress] = useState('');
-  const [gallery, setGallery] = useState(null);
+  // const [gallery, setGallery] = useState(null);
   const [resume, setResume] = useState(null);
   const [videoUrl, setVideoUrl] = useState('');
   const [awards, setAwards] = useState([{ id: 1, value: '' }]);
   const [skills, setSkills] = useState([{ id: 1, value: '' }]);
   const [faqs, setFaqs] = useState([{ id: 1, value: '' }]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`/freelancerProfile/${userId}`);
+        const profile = response.data;
+        setFullName(profile.fullName || '');
+        setEmail(profile.email || '');
+        setPhone(profile.phone || '');
+        setLocation(profile.location || '');
+        setDescription(profile.description || '');
+        setJobTitle(profile.jobTitle || '');
+        setMinRate(profile.minRate || '');
+        setMaxRate(profile.maxRate || '');
+        setGender(profile.gender || '');
+        setDob(profile.dob || '');
+        setFreelancerType(profile.freelancerType || '');
+        setCategory(profile.category || '');
+        setFriendlyAddress(profile.friendlyAddress || '');
+        setVideoUrl(profile.videoUrl || '');
+        setAwards(profile.awards ? profile.awards.map((award, index) => ({ id: index + 1, value: award })) : []);
+        setSkills(profile.skills ? profile.skills.map((skill, index) => ({ id: index + 1, value: skill })) : []);
+        setFaqs(profile.faqs ? profile.faqs.map((faq, index) => ({ id: index + 1, value: faq })) : []);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId]);
 
   const handleEditorChange = (content) => {
     setDescription(content);
@@ -35,31 +74,50 @@ const FreelancerProfile = () => {
     setState(state.filter((item) => item.id !== id));
   };
 
-  const handleSaveProfile = () => {
-    const profileData = {
-      profileImage,
-      fullName,
-      email,
-      phone,
-      location,
-      jobTitle,
-      minRate,
-      maxRate,
-      description,
-      gallery,
-      resume,
-      videoUrl,
-      awards,
-      skills,
-      faqs,
-      gender,
-      dob,
-      freelancerType,
-      category,
-      friendlyAddress,
-    };
-    console.log('Profile Data:', profileData);
+  const handleSaveProfile = async () => {
+    const formData = new FormData();
+    formData.append('fullName', fullName);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('location', location);
+    formData.append('description', description);
+    formData.append('jobTitle', jobTitle);
+    formData.append('minRate', minRate);
+    formData.append('maxRate', maxRate);
+    formData.append('gender', gender);
+    formData.append('dob', dob);
+    formData.append('freelancerType', freelancerType);
+    formData.append('category', category);
+    formData.append('friendlyAddress', friendlyAddress);
+    formData.append('videoUrl', videoUrl);
+    formData.append('awards', JSON.stringify(awards.map((award) => award.value)));
+    formData.append('skills', JSON.stringify(skills.map((skill) => skill.value)));
+    formData.append('faqs', JSON.stringify(faqs.map((faq) => faq.value)));
+
+    if (profileImage) {
+      formData.append('profileImage', profileImage);
+    }
+    // if (gallery) {
+    //   formData.append('gallery', gallery);
+    // }
+    if (resume) {
+      formData.append('resume', resume);
+    }
+
+    try {
+      const response = await axios.post('/freelancerProfile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('Profile saved successfully:', response.data);
+      alert('Profile saved successfully');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile. Please try again.');
+    }
   };
+
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -72,7 +130,11 @@ const FreelancerProfile = () => {
       </div>
 
       {/* Full Name */}
-      <div className="mb-6">
+      
+
+      {/* Gender, Date of Birth */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="">
         <label className="block text-lg font-semibold mb-2">Full Name</label>
         <input
           type="text"
@@ -82,8 +144,6 @@ const FreelancerProfile = () => {
         />
       </div>
 
-      {/* Gender, Date of Birth */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-lg font-semibold mb-2">Gender</label>
           <select
@@ -103,6 +163,15 @@ const FreelancerProfile = () => {
             type="date"
             value={dob}
             onChange={(e) => setDob(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
+        <div>
+          <label className="block text-lg font-semibold mb-2">Job Title</label>
+          <input
+            type="text"
+            value={jobTitle}
+            onChange={(e) => setJobTitle(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -153,25 +222,22 @@ const FreelancerProfile = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select Category</option>
-            <option value="web-development">Web Development</option>
-            <option value="graphic-design">Graphic Design</option>
-            <option value="content-writing">Content Writing</option>
+            <option value="programming-tech">Programming & Tech</option>
+            <option value="graphic-and-design">Graphics & Design</option>
+            <option value="content-writing">Writing & Translation</option>
             <option value="digital-marketing">Digital Marketing</option>
+            <option value="business">Business</option>
+            <option value="lifestyle">Lifestyle</option>
+            <option value="music-audio">Music & Audio</option>
+            <option value="video-animation">Video & Animation</option>
+
           </select>
         </div>
       </div>
 
       {/* Job Title, Rates */}
-      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div>
-          <label className="block text-lg font-semibold mb-2">Job Title</label>
-          <input
-            type="text"
-            value={jobTitle}
-            onChange={(e) => setJobTitle(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+       
         <div>
           <label className="block text-lg font-semibold mb-2">Min Hourly Rate</label>
           <input
@@ -218,6 +284,7 @@ const FreelancerProfile = () => {
       <div className="mb-6">
         <label className="block text-lg font-semibold mb-2">Description</label>
         <Editor
+          apiKey='65gcyx9y0yezfpmk2p7xn336dpzjwn2walh2cekmrxk5o9k7'
           value={description}
           init={{
             height: 300,
@@ -237,10 +304,10 @@ const FreelancerProfile = () => {
       </div>
 
       {/* Media Upload */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <label className="block text-lg font-semibold mb-2">Gallery Image</label>
         <input type="file" onChange={(e) => setGallery(e.target.files[0])} className="block w-full" />
-      </div>
+      </div> */}
 
       <div className="mb-6">
         <label className="block text-lg font-semibold mb-2">Resume</label>
@@ -345,3 +412,6 @@ const FreelancerProfile = () => {
 };
 
 export default FreelancerProfile;
+
+
+

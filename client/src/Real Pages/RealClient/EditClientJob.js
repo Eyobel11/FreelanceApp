@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-import axios from '../utils/axios'; // Make sure you have axios configured for API calls
+import axios from '../utils/axios'; // Make sure axios is properly configured
+import { useParams, useNavigate } from 'react-router-dom'; // Import useParams and useNavigate
 
-function PostNewProject() {
+const EditJob = () => {
+  const { jobId } = useParams(); // Get jobId from the route params
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -33,6 +37,36 @@ function PostNewProject() {
     'Support Agent'
   ];
 
+  // Fetch the existing job data
+  useEffect(() => {
+    const fetchJob = async () => {
+      if (!jobId) return;
+
+      try {
+        const response = await axios.get(`/jobpost/${jobId}`);
+        const job = response.data;
+        setTitle(job.title);
+        setCategory(job.category);
+        setJobType(job.jobType);
+        setJobLocationType(job.jobLocationType);
+        setLocation(job.location);
+        setDuration(job.duration);
+        setExperienceLevel(job.experienceLevel);
+        setFriendlyAddress(job.friendlyAddress);
+        setWebsite(job.website);
+        setEnglishLevel(job.englishLevel);
+        setMinPrice(job.minPrice);
+        setMaxPrice(job.maxPrice);
+        setDescription(job.description);
+        setSelectedSkills(job.skills || []);
+      } catch (error) {
+        console.error('Error fetching job data:', error);
+      }
+    };
+
+    fetchJob();
+  }, [jobId]);
+
   const handleEditorChange = (content) => {
     setDescription(content);
   };
@@ -49,8 +83,8 @@ function PostNewProject() {
     setSelectedSkills(skills.length === selectedSkills.length ? [] : [...skills]);
   };
 
-  // Handle form submission
-  const handleSubmit = async () => {
+  // Handle the job update
+  const handleUpdateJob = async () => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('category', category);
@@ -67,7 +101,7 @@ function PostNewProject() {
     formData.append('description', description);
     formData.append('skills', selectedSkills.join(','));
 
-    // Append files
+    // Append files if they exist
     if (featuredImage) {
       formData.append('featuredImage', featuredImage);
     }
@@ -78,24 +112,24 @@ function PostNewProject() {
     }
 
     try {
-      const response = await axios.post('/jobpost', formData, {
+      await axios.put(`/jobpost/${jobId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log('Job posted successfully:', response.data);
-      // Optionally, reset the form or display a success message
+      console.log('Job updated successfully');
+      navigate('/dashboardDash/client/myjobs'); // Redirect to My Jobs after updating
     } catch (error) {
-      console.error('Error posting job:', error.response?.data || error.message);
-      // Optionally, display an error message to the user
+      console.error('Error updating job:', error);
     }
   };
 
   return (
     <div className="p-4 md:p-8">
-      {/* General Section */}
+      <h2 className="text-2xl font-semibold mb-4">Edit Job</h2>
+      
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Post a New Project</h2>
+        <h2 className="text-xl font-semibold mb-4">Job Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
             <label className="block mb-2 font-medium">Title</label>
@@ -104,11 +138,10 @@ function PostNewProject() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-              placeholder="Service title..."
             />
           </div>
           <div>
-            <label className="block mb-2 font-medium">Categories</label>
+            <label className="block mb-2 font-medium">Category</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -127,69 +160,11 @@ function PostNewProject() {
           </div>
           <div>
             <label className="block mb-2 font-medium">Job Type</label>
-            <select
+            <input
+              type="text"
               value={jobType}
               onChange={(e) => setJobType(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-            >
-              <option value="">Select Job Type</option>
-              <option>Full-Time</option>
-              <option>Part-Time</option>
-              <option>Contract</option>
-              <option>Freelance</option>
-            </select>
-          </div>
-          <div>
-            <label className="block mb-2 font-medium">Job Location Type</label>
-            <select
-              value={jobLocationType}
-              onChange={(e) => setJobLocationType(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3"
-            >
-              <option value="">Select Location Type</option>
-              <option>Onsite</option>
-              <option>Partial Onsite</option>
-              <option>Remote</option>
-            </select>
-          </div>
-          <div>
-            <label className="block mb-2 font-medium">Duration</label>
-            <select
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3"
-            >
-              <option value="">Select Duration</option>
-              <option>1 Hour</option>
-              <option>1 Day</option>
-              <option>1 Week</option>
-              <option>2-3 Days</option>
-              <option>2-3 Hours</option>
-              <option>2-3 Weeks</option>
-            </select>
-          </div>
-          <div>
-            <label className="block mb-2 font-medium">Experience Level</label>
-            <select
-              value={experienceLevel}
-              onChange={(e) => setExperienceLevel(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3"
-            >
-              <option value="">Select Experience Level</option>
-              <option>1-2 Years</option>
-              <option>3-4 Years</option>
-              <option>5+ Years</option>
-              <option>Fresh</option>
-            </select>
-          </div>
-          <div>
-            <label className="block mb-2 font-medium">Friendly Address</label>
-            <input
-              type="text"
-              value={friendlyAddress}
-              onChange={(e) => setFriendlyAddress(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3"
-              placeholder="e.g. 22 street"
             />
           </div>
           <div>
@@ -199,7 +174,33 @@ function PostNewProject() {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-              placeholder="e.g. Addis Ababa"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium">Duration</label>
+            <input
+              type="text"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium">Experience Level</label>
+            <input
+              type="text"
+              value={experienceLevel}
+              onChange={(e) => setExperienceLevel(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium">Friendly Address</label>
+            <input
+              type="text"
+              value={friendlyAddress}
+              onChange={(e) => setFriendlyAddress(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
             />
           </div>
           <div>
@@ -209,21 +210,16 @@ function PostNewProject() {
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-              placeholder="e.g. www.google.com"
             />
           </div>
           <div>
             <label className="block mb-2 font-medium">English Level</label>
-            <select
+            <input
+              type="text"
               value={englishLevel}
               onChange={(e) => setEnglishLevel(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-            >
-              <option value="">Select English Level</option>
-              <option>Fluent</option>
-              <option>Intermediate</option>
-              <option>Basic</option>
-            </select>
+            />
           </div>
           <div>
             <label className="block mb-2 font-medium">Min Price</label>
@@ -232,7 +228,6 @@ function PostNewProject() {
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-              placeholder="e.g. 100"
             />
           </div>
           <div>
@@ -242,12 +237,10 @@ function PostNewProject() {
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3"
-              placeholder="e.g. 200"
             />
           </div>
         </div>
 
-        {/* Description Section */}
         <div className="mb-6">
           <label className="block mb-2 font-medium">Description</label>
           <Editor
@@ -257,14 +250,13 @@ function PostNewProject() {
               height: 300,
               menubar: false,
               plugins: 'lists link image code',
-              toolbar:
-                'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat',
+              toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat',
             }}
             onEditorChange={handleEditorChange}
           />
         </div>
       </div>
-
+      
       {/* Media Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Media</h2>
@@ -285,7 +277,6 @@ function PostNewProject() {
         </div>
       </div>
 
-      {/* Skills Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Skills</h2>
         <div className="flex justify-between mb-4">
@@ -311,17 +302,14 @@ function PostNewProject() {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex">
-        <button
-          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
-          onClick={handleSubmit}
-        >
-          Submit & Preview
-        </button>
-      </div>
+      <button
+        onClick={handleUpdateJob}
+        className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+      >
+        Update Job
+      </button>
     </div>
   );
-}
+};
 
-export default PostNewProject;
+export default EditJob;

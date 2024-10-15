@@ -167,7 +167,7 @@ const DashboardClient = () => {
             <div>
               <p className="text-sm font-medium">{user.name}</p>
               <p className="text-xs text-gray-400">{user.role}</p>
-              <Link to="/dashboardDash/freelancer/viewprofile" className="text-xs text-blue-400">
+              <Link to={`/dashboardDash/client/setprofile/${user._id}`} className="text-xs text-blue-400">
                 View Profile
               </Link>
             </div>
@@ -197,13 +197,13 @@ const DashboardClient = () => {
               <FaUsers className="mr-3" />
               Job Applicants
             </a>
-            <a
-              href="#"
+            <Link to =""
+             
               className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white flex items-center"
             >
               <FaHeart className="mr-3" />
               Favorites
-            </a>
+            </Link>
             <a
               href="#"
               className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white flex items-center"

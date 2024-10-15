@@ -57,7 +57,10 @@ import MyJobs from './Real Pages/RealClient/MyJobs';
 import JobListDash from './Real Pages/JobList';
 import JobDetailDash from './Real Pages/JobShow';
 import ClientProfileDetail from './Real Pages/ClientProfileDetail';
-
+import ViewClientProfile from './Real Pages/RealClient/ViewClientProfile'
+import JobDetailDashClient from './Real Pages/RealClient/JobShowDetail';
+import EditJob from './Real Pages/RealClient/EditClientJob';
+import EditServicePost from './Real Pages/RealFreelancer/EditProfileService';
  
 const clientID = "418054380291-vrjp8ju8edl5a7rdu66p16pn49sshbm6.apps.googleusercontent.com";
 
@@ -98,7 +101,10 @@ function App() {
               <Route path="/dashboardDash/client/editprofile" element={<ClientProfile />} />
               <Route path="/dashboardDash/client/postproject" element={<PostNewProject />} />
               <Route path="/dashboardDash/client/myjobs" element={<MyJobs />} />
-              
+              <Route path="/dashboardDash/client/setprofile/:userId" element={ <ViewClientProfile />} />
+              <Route path="/dashboardDash/client/job/:jobId" element={<JobDetailDashClient />} />
+              <Route path="/dashboardDash/client/editjob/:jobId" element={<EditJob />} />
+
               </Route>
 
 
@@ -110,8 +116,9 @@ function App() {
                   <Route path="/dashboardDash/freelancer/editprofile" element={<FreelancerProfile />} />
                   <Route path="/dashboardDash/freelancer/postservice" element={<PostNewService />} />
                   <Route path="/dashboardDash/freelancer/servicedetail" element={<ServiceShowDetail />} />
-                  <Route path="/dashboardDash/freelancer/viewprofile" element={<ViewProfilePageReal />} />
-                  
+                  <Route path="/dashboardDash/freelancer/setprofile/:userId" element={<ViewProfilePageReal />} />
+                  <Route path="/dashboardDash/freelancer/service/:serviceId" element={<ServiceShowDetail />} />
+                  <Route path="/dashboardDash/freelancer/editservice/:serviceId" element={<EditServicePost />} />
               
               </Route>
 
