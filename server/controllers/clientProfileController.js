@@ -1,4 +1,5 @@
 const ClientProfile = require('../models/ClientProfile');
+const Notification = require('../models/Notification'); // Import Notification model
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -66,6 +67,19 @@ const createOrUpdateProfile = async (req, res) => {
   
         // Save updated profile
         await profile.save();
+
+
+        // Create a notification for profile update
+       const notification = new Notification({
+        userId: req.user.id,
+        type: 'Profile',
+        message: `Your profile has been updated successfully.`,
+        readStatus: false,
+        link: `/client/setprofile/${req.user.id}`
+      });
+      await notification.save();
+
+
         return res.status(200).json(profile);
       } else {
         // Create a new profile if it doesn't exist
@@ -89,6 +103,18 @@ const createOrUpdateProfile = async (req, res) => {
         });
   
         await newProfile.save();
+
+        // Create a notification for profile update
+       const notification = new Notification({
+        userId: req.user.id,
+        type: 'Profile',
+        message: `Your profile has been updated successfully.`,
+        readStatus: false,
+        link: `/client/setprofile/${req.user.id}`
+      });
+      await notification.save();
+
+
         return res.status(201).json(newProfile);
       }
     } catch (error) {
@@ -159,6 +185,17 @@ const updateProfile = async (req, res) => {
     if (!updatedProfile) {
       return res.status(404).json({ message: 'Profile not found' });
     }
+
+        // Create a notification for profile update
+        const notification = new Notification({
+          userId: req.user.id,
+          type: 'Profile',
+          message: `Your profile has been updated successfully.`,
+          readStatus: false,
+          link: `/freelancer/${userId}`
+        });
+        await notification.save();
+        
 
     res.status(200).json(updatedProfile);
   } catch (error) {

@@ -31,9 +31,9 @@ const LoginDash = () => {
 
         // Navigate based on user role
         if (data.role === 'freelancer') {
-          navigate('/dashboardDash/freelancer', {replace: true});
+          navigate('/freelancer', {replace: true});
         } else if (data.role === 'client') {
-          navigate('/dashboardDash/client', {replace: true});
+          navigate('/client', {replace: true});
         }
       } else {
         console.error('Invalid response structure:', data);
@@ -46,8 +46,8 @@ const LoginDash = () => {
   return (
     <>
       <Navbar />
-      <div className="flex justify-center items-center min-h-screen bg-orange-100">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <div className="flex justify-center items-center min-h-screen bg-white ">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border-2 border-orange-100">
           <h2 className="text-3xl font-bold text-center mb-4">Log In</h2>
           <p className="text-center text-gray-600 mb-6">
             Give your visitor a smooth online experience with a solid UX design

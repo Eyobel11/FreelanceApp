@@ -2,17 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt, FaRegCalendarAlt, FaEye } from 'react-icons/fa'; // Import FaEye for the view icon
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import axios from '../utils/axios'; // Make sure axios is properly configured
+import Swal from 'sweetalert2';
+import { useSelector } from 'react-redux';  // To get userId from Redux
 
 const MyService = () => {
   const [services, setServices] = useState([]);
   const [sortBy, setSortBy] = useState('Newest');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const { user } = useSelector((state) => state.auth);  // Fetch user data from Redux
+
   // Fetch services from the backend
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get('/servicepost'); // Make sure the endpoint is correct
+        const response = await axios.get(`/servicepost/freelancer/${user._id}`); // Make sure the endpoint is correct
         setServices(response.data);
       } catch (error) {
         console.error('Error fetching services:', error);
@@ -33,14 +37,24 @@ const MyService = () => {
       return;
     }
 
-    try {
-      await axios.delete(`/servicepost/${serviceId}`); // Make sure the endpoint is correct
-      // Update state to remove the deleted service
-      setServices((prevServices) => prevServices.filter(service => service._id !== serviceId));
-      console.log('Service deleted successfully');
-    } catch (error) {
-      console.error('Error deleting service:', error);
-    }
+    Swal.fire({
+      title: 'Are you sure you want to delete this service?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3E4B40',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`/servicepost/${serviceId}`); // Make sure the endpoint is correct
+          setServices((prevServices) => prevServices.filter(service => service._id !== serviceId));
+          Swal.fire('Deleted!', 'Your service has been deleted.', 'success');
+        } catch (error) {
+          console.error('Error deleting service:', error);
+        }
+      }
+    });
   };
 
   return (
@@ -107,10 +121,10 @@ const MyService = () => {
                   </p>
                 </td>
                 <td className="py-2 px-4 flex items-center">
-                  <Link to={`/dashboardDash/freelancer/service/${service._id}`} className="text-blue-500 mx-2">
+                  <Link to={`/freelancer/service/${service._id}`} className="text-blue-500 mx-2">
                     <FaEye /> {/* View details icon */}
                   </Link>
-                  <Link to={`/dashboardDash/freelancer/editservice/${service._id}`} className="text-yellow-500 mx-2">
+                  <Link to={`//freelancer/editservice/${service._id}`} className="text-yellow-500 mx-2">
                     <FaEdit />
                   </Link>
                   <button onClick={() => handleDelete(service._id)} className="text-red-500 mx-2">

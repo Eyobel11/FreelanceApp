@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaMapMarkerAlt, FaClock, FaStar, FaEnvelope, FaPhone, FaUserCircle, FaBriefcase, FaCalendarAlt, FaLanguage, FaTransgender } from 'react-icons/fa';
-import { useParams } from 'react-router-dom'; // To get userId from URL
+import { Link, useParams } from 'react-router-dom'; // To get userId from URL
 import { useSelector } from 'react-redux'; // To get userId from Redux
 import axios from '../utils/axios';
 
@@ -9,12 +9,15 @@ const ViewProfilePageReal = () => {
   const reduxUserId = useSelector((state) => state.auth.userId); // Get userId from Redux
   const userId = paramUserId || reduxUserId; // Use paramUserId if it exists, else use reduxUserId
   const [profile, setProfile] = useState(null);
+  const [jobs, setJobs] = useState([]);  // Add state for jobs
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(`/freelancerprofile/${userId}`);
         setProfile(response.data);
+        const jobsResponse = await axios.get(`/servicepost/freelancer/${userId}`);  // Fetch client jobs
+        setJobs(jobsResponse.data);
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -33,7 +36,7 @@ const ViewProfilePageReal = () => {
     <div className="min-h-screen bg-gray-100">
 
       {/* Header Section */}
-      <div className="bg-orange-50 text-black py-10 px-6 lg:flex lg:items-center lg:justify-between">
+      <div className="image-add bg-center bg-cover text-black py-10 px-6 lg:flex lg:items-center lg:justify-between">
         <div className="lg:flex lg:items-center">
           <img
             src={profile.profileImage || "https://via.placeholder.com/150"}
@@ -46,7 +49,7 @@ const ViewProfilePageReal = () => {
             <div className="flex items-center space-x-6 mt-4">
               <span className="flex items-center">
                 <FaCalendarAlt className="mr-2 text-gray-600" />
-                DOB: {profile.dob}
+                DOB: {new Date(profile.dob).toLocaleDateString()}
               </span>
               <span className="flex items-center">
                 <FaMapMarkerAlt className="mr-2 text-gray-600" />
@@ -83,7 +86,7 @@ const ViewProfilePageReal = () => {
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-xl font-bold mb-4">Education</h3>
             <ul className="list-disc ml-5">
-              <li>{profile.skills}</li>
+              <li>{profile.educations}</li>
               <li>Master of Healthcare Management - ABC University, 2015</li>
             </ul>
           </div>
@@ -92,7 +95,7 @@ const ViewProfilePageReal = () => {
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-2xl font-bold mb-4">Work Experience</h3>
             <ul className="list-disc ml-5">
-              <li>{profile.experience}</li>
+              <li>{profile.works}</li>
               <li>Healthcare Consultant, Freelance, 2018-Present</li>
             </ul>
           </div>
@@ -110,24 +113,34 @@ const ViewProfilePageReal = () => {
           <div className="p-6">
             <h3 className="text-2xl font-bold mb-4">Posted Services</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-                <img 
-                  src="https://freeio.blogdu.de/wp-content/uploads/2022/11/service11-768x576.jpg"
-                  alt="Service Image"
-                  className="w-full h-40 object-cover rounded-md mb-4"
-                />
-                <div className="text-gray-500 text-sm">Design & Creative</div>
-                <h3 className="text-lg font-semibold text-gray-900">Developers drop the framework folder into a...</h3>
-                <div className="flex items-center mt-2 mb-4">
-                  <FaStar className="text-yellow-400" />
-                  <span className="ml-1 text-gray-700 font-bold">4.5</span>
-                  <span className="ml-2 text-gray-500">(2 Reviews)</span>
+
+
+            {jobs.map(job => (
+
+                  <Link to={`/freelancer/service/${job._id}`}  >
+                <div key={job._id} className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                  <img 
+                    src={job.featuredImage || 'https://via.placeholder.com/150'}  // Placeholder if no image
+                    alt="Service Image"
+                    className="w-full h-40 object-cover rounded-md mb-4"
+                  />
+                  <div className="text-gray-500 text-sm">{job.category}</div>
+                  <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                  <div className="flex items-center mt-2 mb-4">
+                    <FaStar className="text-yellow-400" />
+                    <span className="ml-1 text-gray-700 font-bold">{job.rating || 'N/A'}</span>
+                    <span className="ml-2 text-gray-500">({job.reviewCount || 0} Reviews)</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">{profile.fullName}</div>
+                    <div className="text-gray-900 font-bold">Starting at: ${job.servicePrice}</div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-500">John Paul</div>
-                  <div className="text-gray-900 font-bold">Starting at: $128.00</div>
-                </div>
-              </div>
+
+                </Link>
+              ))}
+
+
               {/* Add more services here if needed */}
             </div>
           </div>

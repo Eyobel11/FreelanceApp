@@ -7,6 +7,11 @@ const EditServicePost = () => {
   const { serviceId } = useParams(); // Get serviceId from the route params
   const navigate = useNavigate(); // Initialize useNavigate
 
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [fullName, setFullName] = useState('');
+  const [location, setLocation] = useState('');
+
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -25,6 +30,8 @@ const EditServicePost = () => {
       try {
         const response = await axios.get(`/servicepost/${serviceId}`);
         const service = response.data;
+        setFullName(service.fullName)
+        setLocation(service.location)
         setTitle(service.title);
         setCategory(service.category);
         setDeliveryTime(service.deliveryTime);
@@ -64,10 +71,15 @@ const EditServicePost = () => {
     formData.append('servicePrice', servicePrice);
     formData.append('englishLevel', englishLevel);
     formData.append('description', description);
+    formData.append('fullName', fullName);
+    formData.append('location', location);
 
     // Append files if they exist
     if (featuredImage) {
       formData.append('featuredImage', featuredImage);
+    }
+    if (profileImage) {
+      formData.append('profileImage', profileImage);
     }
     if (gallery.length > 0) {
       for (const file of gallery) {
@@ -82,7 +94,7 @@ const EditServicePost = () => {
         }
       });
       console.log('Service updated successfully');
-      navigate('/dashboardDash/freelancer/myservice'); // Redirect to My Services after updating
+      navigate('/freelancer/myservice'); // Redirect to My Services after updating
     } catch (error) {
       console.error('Error updating service:', error);
     }
@@ -94,8 +106,36 @@ const EditServicePost = () => {
       
       {/* General Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Service Information</h2>
+        {/* <h2 className="text-xl font-semibold mb-4">Service Information</h2> */}
+
+                {/* Profile Image */}
+      <div className="mb-6">
+        <label className="block text-lg font-semibold mb-2">Profile Image</label>
+        <input type="file" onChange={(e) => setProfileImage(e.target.files[0])} className="block w-full" />
+      </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+        <div>
+            <label className="block mb-2 font-medium">FullName</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 font-medium">Location</label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+          </div>
+
           <div>
             <label className="block mb-2 font-medium">Title</label>
             <input

@@ -45,7 +45,7 @@ const ServiceShowDetail = () => {
   return (
     <div className="container mx-auto p-4">
       {/* Header Section */}
-      <div className="p-6 bg-gray-100">
+      <div className="p-14 image-add bg-center bg-cover">
         <h1 className="text-3xl font-bold">{service.title || "Service Title"}</h1>
         <div className="flex items-center space-x-6 mt-4">
           <span className="flex items-center">

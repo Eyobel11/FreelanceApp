@@ -1,4 +1,6 @@
 const FreelancerProfile = require('../models/FreelancerProfile');
+const Notification = require('../models/Notification'); // Import Notification model
+
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -43,6 +45,8 @@ const createOrUpdateFreelancerProfile = async (req, res) => {
     videoUrl,
     skills,
     awards,
+    works,
+    educations,
     faqs,
   } = req.body;
 
@@ -68,6 +72,8 @@ const createOrUpdateFreelancerProfile = async (req, res) => {
       profile.videoUrl = videoUrl || profile.videoUrl;
       profile.skills = skills ? skills.split(',') : profile.skills;
       profile.awards = awards ? awards.split(',') : profile.awards;
+      profile.works = works ? works.split(',') : profile.works;
+      profile.educations = educations ? educations.split(',') : profile.educations;
       profile.faqs = faqs ? faqs.split(',') : profile.faqs;
 
       // If new files are uploaded, update the file paths
@@ -80,6 +86,18 @@ const createOrUpdateFreelancerProfile = async (req, res) => {
 
       // Save updated profile
       await profile.save();
+
+       // Create a notification for profile update
+       const notification = new Notification({
+         userId: req.user.id,
+         type: 'Profile',
+         message: `Your profile has been updated successfully.`,
+         readStatus: false,
+         link: `/freelancer/setprofile/${req.user.id}`
+       });
+       await notification.save();
+
+
       return res.status(200).json(profile);
     } else {
       // Create a new profile if it doesn't exist
@@ -101,17 +119,40 @@ const createOrUpdateFreelancerProfile = async (req, res) => {
         videoUrl,
         skills: skills ? skills.split(',') : [],
         awards: awards ? awards.split(',') : [],
+        works: works ? works.split(',') : [],
+        educations: educations ? educations.split(',') : [],
         faqs: faqs ? faqs.split(',') : [],
         profileImage: req.files['profileImage'] ? `/uploads/profile-pictures/${req.files['profileImage'][0].filename}` : '',
         resume: req.files['resume'] ? `/uploads/resumes/${req.files['resume'][0].filename}` : '',
       });
 
       await newProfile.save();
+
+      // Create a notification for profile creation
+      const notification = new Notification({
+        userId: req.user.id,
+        type: 'Profile',
+        message: `Your profile has been created successfully.`,
+        readStatus: false,
+         link: `/freelancer/setprofile/${req.user.id}`
+      });
+      await notification.save();
+
       return res.status(201).json(newProfile);
     }
   } catch (error) {
     console.error('Error creating or updating profile:', error.message);
     res.status(500).json({ message: 'Error creating or updating profile' });
+  }
+};
+
+const getAllFreeLancerProfile = async (req, res) => {
+  try {
+    const profile = await FreelancerProfile.find().populate('user', ['name', 'email']);
+    res.json(profile);
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ message: 'Error fetching profile' });
   }
 };
 
@@ -128,6 +169,20 @@ const getFreelancerProfile = async (req, res) => {
     res.status(500).json({ message: 'Error fetching profile' });
   }
 };
+
+const getFreelancerProfileView = async (req, res) => {
+  try {
+    const profile = await FreelancerProfile.findById(req.params.id).populate('user', ['fullName', 'email']);
+    if (!profile) {
+      return res.status(404).json({ message: 'Profile not found' });
+    }
+    res.json(profile);
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ message: 'Error fetching profile' });
+  }
+};
+
 
 // Update profile
 const updateFreelancerProfile = async (req, res) => {
@@ -147,6 +202,8 @@ const updateFreelancerProfile = async (req, res) => {
     friendlyAddress,
     videoUrl,
     skills,
+    educations,
+    works,
     awards,
     faqs,
   } = req.body;
@@ -171,6 +228,8 @@ const updateFreelancerProfile = async (req, res) => {
         videoUrl,
         skills: skills ? skills.split(',') : [],
         awards: awards ? awards.split(',') : [],
+        works: works ? works.split(',') : [],
+        educations: educations ? educations.split(',') : [],
         faqs: faqs ? faqs.split(',') : [],
         profileImage: req.files['profileImage'] ? `/uploads/profile-pictures/${req.files['profileImage'][0].filename}` : undefined,
         resume: req.files['resume'] ? `/uploads/resumes/${req.files['resume'][0].filename}` : undefined,
@@ -181,6 +240,16 @@ const updateFreelancerProfile = async (req, res) => {
     if (!updatedProfile) {
       return res.status(404).json({ message: 'Profile not found' });
     }
+
+    // Create a notification for profile update
+    const notification = new Notification({
+      userId: req.user.id,
+      type: 'Profile',
+      message: `Your profile has been updated successfully.`,
+      readStatus: false,
+      link: `/freelancer/${userId}`
+    });
+    await notification.save();
 
     res.status(200).json(updatedProfile);
   } catch (error) {
@@ -193,5 +262,7 @@ module.exports = {
   createOrUpdateFreelancerProfile,
   getFreelancerProfile,
   updateFreelancerProfile,
+  getAllFreeLancerProfile,
+  getFreelancerProfileView,
   upload,
 };

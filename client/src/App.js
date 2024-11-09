@@ -1,35 +1,12 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import PostJob from './pages/PostJob';
-import JobList from './pages/JobList';
-import JobDetails from './pages/JobDetails';
-import Chat from './components/Chat'; // Import Chat component
-// import Navbar from './components/Navbar'; // Import the NavBar
-import Payment from './pages/Payment'; // Import the Payment component
-import UserDashboard from './pages/UserDashboard';
-import DashboardHome from './dashboard/DashboardHome';
-import Jobs from './dashboard/Jobs';
-import Messages from './dashboard/Message';
-import Payments from './dashboard/Payments';
-import Settings from './dashboard/Settings';
-import FreelancerDashboard from './dashboard/FreelancerDashboard';
-import ClientDashboard from './dashboard/ClientDashboard';
-import ManageJobs from './components/ManageJobs';
 
-import PortfolioPage from './pages/PortfolioPage';
-import CreateProfilePage from './pages/CreateProfilePage';  // Import the new component
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+
+
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect,  } from 'react';
 import { loginSuccess } from './slices/authSlice';
-import EditProfilePage from './pages/EditProfilePage';
-import ViewProfilePage from './pages/ViewProfilePage';
-import EditJobPage from './pages/EditJobPage';
 
-import Notification from './components/Notification'
-import ReviewForm from './components/ReviewForm';
-import ReviewList from './pages/ReviewList';
 
 
 import HomePage from './Real DashBoard/HomePage'
@@ -61,13 +38,36 @@ import ViewClientProfile from './Real Pages/RealClient/ViewClientProfile'
 import JobDetailDashClient from './Real Pages/RealClient/JobShowDetail';
 import EditJob from './Real Pages/RealClient/EditClientJob';
 import EditServicePost from './Real Pages/RealFreelancer/EditProfileService';
+import Contact from './Real Pages/Contact';
+import NotFound from './Real Pages/404';
+import TermsAndConditions from './Real Pages/TermsandCondition';
+import EditClientProfile from './Real Pages/RealClient/EditProfileClient';
+import JobProposals from './Real Pages/RealClient/ViewProposals';
+import SubmitProposal from './Real Pages/RealFreelancer/SubmitProposal';
+import ClientProposals from './Real Pages/RealClient/ProposalsMain';
+import FreelancerProposals from './Real Pages/RealFreelancer/ViewPropsalFreelancer';
+import MessagingPage from './Real Pages/MessagingPage';
+import MessageComponent from './Real Pages/MessageComponent';
+import FreelancerJobListDash from './Real Pages/RealFreelancer/FreelancerJobList';
+import FreelancerJobDetailDash from './Real Pages/RealFreelancer/FreelancerJobDetai';
+import FindServiceList from './Real Pages/RealClient/FindService';
+import FindServiceShow from './Real Pages/RealClient/FindServiceDetail';
+import ViewFreelancerCarousel from './Real Pages/RealClient/ViewFreelancerList';
+import ViewFreelancerProfileDetail from './Real Pages/RealClient/ViewFreelancerProfileDetail';
+import MessageInbox from './Real Pages/MessageInbox';
+import MessageThread from './Real Pages/MessageThread';
+import FreelancerInbox from './Real Pages/FreelancerInbox';
+import ClientInbox from './Real Pages/ClientInbox';
+import ClientContact from './Real Pages/RealClient/ClientHelp';
+import FreelancerContact from './Real Pages/RealFreelancer/FreelancerHelp';
  
 const clientID = "418054380291-vrjp8ju8edl5a7rdu66p16pn49sshbm6.apps.googleusercontent.com";
 
 function App() {
-  // Assuming userId is fetched from authentication or context
-  const userId = "123"; // Placeholder for now, should be dynamically retrieved
+  
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user); // Fetch the user from Redux
+  const userId = "123";
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -85,7 +85,7 @@ function App() {
         <div className='App'>
           {/* <Navbar /> Add NavBar here */}
           <Routes>
-              <Route path = "/dash" element = {<HomePage />}>
+              <Route path = "/" element = {<HomePage />}>
 
   
               
@@ -95,78 +95,82 @@ function App() {
               <Route path="/loginDash" element={<LoginDash />} />
 
 
-              <Route path="/dashboardDash/client" element={<DashboardClient />} >
+              <Route path= "/client" element={<DashboardClient />} >
               
-              <Route path="" element={ <ClientDashboardDash />} />
-              <Route path="/dashboardDash/client/editprofile" element={<ClientProfile />} />
-              <Route path="/dashboardDash/client/postproject" element={<PostNewProject />} />
-              <Route path="/dashboardDash/client/myjobs" element={<MyJobs />} />
-              <Route path="/dashboardDash/client/setprofile/:userId" element={ <ViewClientProfile />} />
-              <Route path="/dashboardDash/client/job/:jobId" element={<JobDetailDashClient />} />
-              <Route path="/dashboardDash/client/editjob/:jobId" element={<EditJob />} />
+                <Route path="" element={ <ClientDashboardDash />} />
+                <Route path="/client/profile" element={<ClientProfile />} />
+                <Route path="/client/postproject" element={<PostNewProject />} />
+                <Route path="/client/myjobs" element={<MyJobs />} />
+                <Route path="/client/setprofile/:userId" element={ <ViewClientProfile />} />
+                <Route path="/client/job/:jobId" element={<JobDetailDashClient />} />
+                <Route path="/client/editjob/:jobId" element={<EditJob />} />
+                <Route path="/client/editprofile" element={ <EditClientProfile />} />
+                <Route path="/client/job/:jobId/proposals" element={<JobProposals />} />
+                <Route path="/client/proposals" element={<ClientProposals />} />
+                <Route path="/client/messages/:clientId" element={<MessagingPage />} />
+                <Route path="/client/servicelist" element={<FindServiceList />} />
+                <Route path="/client/servicedetail/:userId" element={<FindServiceShow />} />
+                <Route path="/client/freelancerlist" element={<ViewFreelancerCarousel />} />
+                <Route path="/client/freelancerprofiledetail/:userId" element={<ViewFreelancerProfileDetail />} />
+                <Route path="/client/inbox" element={<ClientInbox />} />
+                <Route path="/client/contact" element={<ClientContact />} />
+
 
               </Route>
 
+              
 
 
-              <Route path="/dashboardDash/freelancer" element={<Dashboardfreelancer />} >
+
+              <Route path= "/freelancer" element={<Dashboardfreelancer />} >
 
                   <Route path="" element={<FreelancerDashboardDash />} />
-                  <Route path="/dashboardDash/freelancer/myservice" element={<MyService />} />
-                  <Route path="/dashboardDash/freelancer/editprofile" element={<FreelancerProfile />} />
-                  <Route path="/dashboardDash/freelancer/postservice" element={<PostNewService />} />
-                  <Route path="/dashboardDash/freelancer/servicedetail" element={<ServiceShowDetail />} />
-                  <Route path="/dashboardDash/freelancer/setprofile/:userId" element={<ViewProfilePageReal />} />
-                  <Route path="/dashboardDash/freelancer/service/:serviceId" element={<ServiceShowDetail />} />
-                  <Route path="/dashboardDash/freelancer/editservice/:serviceId" element={<EditServicePost />} />
-              
+                  <Route path="/freelancer/myservice" element={<MyService />} />
+                  <Route path="/freelancer/editprofile" element={<FreelancerProfile />} />
+                  <Route path="/freelancer/postservice" element={<PostNewService />} />
+                  <Route path="/freelancer/servicedetail" element={<ServiceShowDetail />} />
+                  <Route path="/freelancer/setprofile/:userId" element={<ViewProfilePageReal />} />
+                  <Route path="/freelancer/service/:serviceId" element={<ServiceShowDetail />} />
+                  <Route path="/freelancer/editservice/:serviceId" element={<EditServicePost />} />
+                  <Route path="/freelancer/submit-proposal/:jobId" element={<SubmitProposal freelancerId={userId} />} />
+                  <Route path="/freelancer/proposals" element={<FreelancerProposals />} />
+                  <Route path="/freelancer/messages/:clientId" element={<MessagingPage />} />
+                  <Route path="/freelancer/joblist" element={ <FreelancerJobListDash />} />
+                  <Route path="/freelancer/jobdetail/:userId" element={ <FreelancerJobDetailDash />} />
+                  <Route path="/freelancer/submit-proposal/:jobId" element={<SubmitProposal freelancerId={userId} />} />
+                  <Route path="/freelancer/inbox" element={<FreelancerInbox />} />
+                  <Route path="/freelancer/contact" element={<FreelancerContact />} />
+
+
               </Route>
 
+                
 
-              <Route path = "/dashboardDash/servicedetail" element={<ServiceShow />} />
-              <Route path = "/dashboardDash/freelancerlist" element={<FreelancerList />} />
-              <Route path = "/dashboardDash/servicelist" element={<ServiceList />} />
-              <Route path = "/dashboardDash/joblist" element={ <JobListDash />} />
-              <Route path = "/dashboardDash/jobdetail" element={ <JobDetailDash />} />
-              <Route path = "/dashboardDash/freelancerprofiledetail" element={<FreelancerProfileDetail />} />
-              <Route path = "/dashboardDash/clientprofiledetail" element={<ClientProfileDetail />} />
+
+              <Route path ="/servicedetail/:userId" element={<ServiceShow />} />
+              <Route path ="/freelancerlist" element={<FreelancerList />} />
+              <Route path ="/servicelist" element={<ServiceList />} />
+              <Route path ="/joblist" element={ <JobListDash />} /> 
+              <Route path ="/jobdetail/:userId" element={ <JobDetailDash />} />
+              <Route path ="/freelancerprofiledetail/:userId" element={<FreelancerProfileDetail />} />
+              <Route path ="/clientprofiledetail" element={<ClientProfileDetail />} />
 
              
+              <Route path = "/contact" element={<Contact />} />
+              <Route path = "*" element={<NotFound />} />
+              <Route path = "/termsandconditions" element={<TermsAndConditions />} />
 
 
+              <Route path="/messagesjob/:senderId/:receiverId" element={<MessageComponent />} />
+              <Route path="/messages/inbox" element={<MessageInbox />} />
+              <Route path="/messages/thread/:threadId" element={<MessageThread />} />
+              
+              
 
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/" element={<JobList />} /> {/* Home or Job Listing Route */}
-            <Route path="/post-job" element={<PostJob />} /> {/* Job Posting Route */}
-            <Route path="/job/:jobId" element={<JobDetails />} /> {/* Job Details Route (with jobId param) */}
-            <Route path="/edit-job/:id" element={<EditJobPage />} />
-            <Route path="/payment" element={<Payment />} /> {/* Add the payment route */}
-            <Route path="/dashboard/freelancer" element={<FreelancerDashboard />} />
-            <Route path="/dashboard/client" element={<ClientDashboard />} />
-            <Route path="/dashboard/freelancer/jobs" element={<ManageJobs />} />            {/* User Dashboard Routes */}
-        <Route path="/dashboard" element={<UserDashboard />}>
-          <Route path="" element={<DashboardHome />} />
-          <Route path="jobs" element={<Jobs />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="payments" element={<Payments />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
 
-        <Route path="/reviews/new" element={<ReviewForm />} /> {/* Review Form */}
-        <Route path="/reviews" element={<ReviewList />} /> {/* Review List */}
-   
-        <Route path="/notification" element={<Notification />} />
-          <Route path="/profile/edit" element={<EditProfilePage />} />
-          <Route path="/profile/:userId" element={<ViewProfilePage />} />
+             
+              
 
-          <Route path="/profile" element={<CreateProfilePage />} />
-  
-          <Route path="/portfolio/:freelancerId" element={<PortfolioPage />} />
-            {/* Add Chat Route */}
-            <Route path="/chat/:jobId" element={
-              <Chat jobId={window.location.pathname.split("/").pop()} userId={userId} />
-            } />
           </Routes>
         </div>
       </Router>

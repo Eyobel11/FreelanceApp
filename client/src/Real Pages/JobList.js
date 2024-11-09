@@ -1,48 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaStar, FaMapMarkerAlt } from "react-icons/fa";
 import Navbar from "../Real DashBoard/Navbar";
 import Footer from "../Real DashBoard/Footer";
+import axios from '../utils/axios'; // Import axios for making API calls
+import { useNavigate } from 'react-router-dom';
 
-const jobs = [
-  {
-    id: 1,
-    title: "Senior Frontend Developer",
-    company: "TechCorp",
-    location: "New York",
-    rating: 4.8,
-    reviews: 32,
-    salary: "$120k/year",
-    datePosted: "1 day ago",
-    thumbnail: "https://via.placeholder.com/600x400", // Replace with actual job image
-    companyLogo: "https://via.placeholder.com/40", // Replace with actual company logo
-  },
-  {
-    id: 2,
-    title: "UX/UI Designer",
-    company: "Creative Studio",
-    location: "Los Angeles",
-    rating: 4.6,
-    reviews: 21,
-    salary: "$95k/year",
-    datePosted: "2 days ago",
-    thumbnail: "https://via.placeholder.com/600x400", // Replace with actual job image
-    companyLogo: "https://via.placeholder.com/40", // Replace with actual company logo
-  },
-  {
-    id: 3,
-    title: "Digital Marketing Specialist",
-    company: "MarketingPro",
-    location: "Miami",
-    rating: 4.7,
-    reviews: 18,
-    salary: "$85k/year",
-    datePosted: "3 days ago",
-    thumbnail: "https://via.placeholder.com/600x400", // Replace with actual job image
-    companyLogo: "https://via.placeholder.com/40", // Replace with actual company logo
-  },
-];
+
 
 const JobListDash = () => {
+
+  const [jobs, setJobs] = useState([]);
+  const navigate = useNavigate();
+
+  const handleFreelancerClick = (jobId) => {
+    navigate(`/jobdetail/${jobId}`);
+  };
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get('/jobpost'); // Replace '/servicepost' with your actual API endpoint
+        setJobs(response.data);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
   return (
     <> 
     <Navbar />
@@ -140,23 +125,23 @@ const JobListDash = () => {
 
           {jobs.map((job) => (
             <div
-              key={job.id}
+              key={job._id}
               className="bg-white p-6 mb-6 rounded-lg shadow-md flex flex-col lg:flex-row items-start"
             >
               <img
-                src={job.thumbnail}
+                src={job.featuredImage}
                 alt={job.title}
                 className="w-full lg:w-1/3 h-40 rounded-lg object-cover mb-4 lg:mb-0 lg:mr-6"
               />
               <div className="flex-1">
                 <h3 className="text-xl font-bold">{job.title}</h3>
-                <p className="text-sm text-gray-500 mb-2">{job.company}</p>
+                <p className="text-sm text-gray-500 mb-2">{job.category}</p>
                 <div className="flex items-center my-2">
-                  <span className="flex items-center text-yellow-500 mr-4">
-                    <FaStar className="mr-1" /> {job.rating}
+                  <span className="flex items-center text-gray-500 mr-4">
+                    {job.jobType}
                   </span>
                   <span className="text-sm text-gray-500">
-                    ({job.reviews} reviews)
+                    {job.jobLocationType} 
                   </span>
                 </div>
                 <div className="flex items-center">
@@ -164,18 +149,18 @@ const JobListDash = () => {
                   <p className="text-gray-600">{job.location}</p>
                 </div>
                 <div className="flex items-center mt-4">
-                  <img
+                  {/* <img
                     src={job.companyLogo}
                     alt={job.company}
                     className="w-8 h-8 rounded-full object-cover mr-2"
-                  />
-                  <p className="text-sm text-gray-500">Posted {job.datePosted}</p>
+                  /> */}
+                  <p className="text-sm text-gray-500">Posted {job.createdAt}</p>
                 </div>
                 <div className="flex items-center justify-end mt-4">
-                  <p className="font-bold text-lg">{job.salary}</p>
+                  <p className="font-bold text-lg">${job.minPrice}-{job.maxPrice}</p>
                 </div>
               </div>
-              <button className="mt-4 lg:mt-0 lg:ml-6 bg-green-900 hover:bg-green-950 text-white px-4 py-2 rounded-lg">
+              <button onClick={() => handleFreelancerClick(job._id)}  className="mt-4 lg:mt-0 lg:ml-6 bg-green-900 hover:bg-green-950 text-white px-4 py-2 rounded-lg">
                 View Details
               </button>
             </div>

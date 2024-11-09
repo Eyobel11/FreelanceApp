@@ -3,6 +3,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import axios from '../utils/axios'; // Make sure you have axios configured for API calls
 import { useParams } from 'react-router-dom';  // To get userId from URL
 import { useSelector } from 'react-redux';  // To get userId from Redux
+import Swal from 'sweetalert2';
 
 const FreelancerProfile = () => {
 
@@ -27,6 +28,8 @@ const FreelancerProfile = () => {
   const [resume, setResume] = useState(null);
   const [videoUrl, setVideoUrl] = useState('');
   const [awards, setAwards] = useState([{ id: 1, value: '' }]);
+  const [educations, setEducation] = useState([{ id: 1, value: '' }]);
+  const [works, setWork] = useState([{ id: 1, value: '' }]);
   const [skills, setSkills] = useState([{ id: 1, value: '' }]);
   const [faqs, setFaqs] = useState([{ id: 1, value: '' }]);
 
@@ -49,6 +52,8 @@ const FreelancerProfile = () => {
         setCategory(profile.category || '');
         setFriendlyAddress(profile.friendlyAddress || '');
         setVideoUrl(profile.videoUrl || '');
+        setEducation(profile.educations ? profile.educations.map((educations, index) => ({ id: index + 1, value: educations })) : []);
+        setWork(profile.works ? profile.works.map((works, index) => ({ id: index + 1, value: works })) : []);
         setAwards(profile.awards ? profile.awards.map((award, index) => ({ id: index + 1, value: award })) : []);
         setSkills(profile.skills ? profile.skills.map((skill, index) => ({ id: index + 1, value: skill })) : []);
         setFaqs(profile.faqs ? profile.faqs.map((faq, index) => ({ id: index + 1, value: faq })) : []);
@@ -90,6 +95,8 @@ const FreelancerProfile = () => {
     formData.append('category', category);
     formData.append('friendlyAddress', friendlyAddress);
     formData.append('videoUrl', videoUrl);
+    formData.append('educations', JSON.stringify(educations.map((educations) => educations.value)));
+    formData.append('works', JSON.stringify(works.map((works) => works.value)));
     formData.append('awards', JSON.stringify(awards.map((award) => award.value)));
     formData.append('skills', JSON.stringify(skills.map((skill) => skill.value)));
     formData.append('faqs', JSON.stringify(faqs.map((faq) => faq.value)));
@@ -110,11 +117,27 @@ const FreelancerProfile = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+      Swal.fire({
+        title: 'Profile Saved!',
+        text: 'Your profile has been saved successfully.',
+        icon: 'success',
+        confirmButtonColor: '#3E4B40',
+      });
+  
       console.log('Profile saved successfully:', response.data);
-      alert('Profile saved successfully');
+      // alert('Profile saved successfully');
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Error saving profile. Please try again.');
+
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error saving your profile. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+      });
+      
+      // alert('Error saving profile. Please try again.');
     }
   };
 
@@ -152,9 +175,9 @@ const FreelancerProfile = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
           </select>
         </div>
         <div>
@@ -209,9 +232,9 @@ const FreelancerProfile = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select Freelancer Type</option>
-            <option value="full-time">Full-time</option>
-            <option value="part-time">Part-time</option>
-            <option value="contract">Contract</option>
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Contract</option>
           </select>
         </div>
         <div>
@@ -222,14 +245,14 @@ const FreelancerProfile = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select Category</option>
-            <option value="programming-tech">Programming & Tech</option>
-            <option value="graphic-and-design">Graphics & Design</option>
-            <option value="content-writing">Writing & Translation</option>
-            <option value="digital-marketing">Digital Marketing</option>
-            <option value="business">Business</option>
-            <option value="lifestyle">Lifestyle</option>
-            <option value="music-audio">Music & Audio</option>
-            <option value="video-animation">Video & Animation</option>
+            <option>Programming & Tech</option>
+            <option>Graphics & Design</option>
+            <option>Writing & Translation</option>
+            <option>Digital Marketing</option>
+            <option>Business</option>
+            <option>Lifestyle</option>
+            <option>Music & Audio</option>
+            <option>Video & Animation</option>
 
           </select>
         </div>
@@ -325,6 +348,57 @@ const FreelancerProfile = () => {
       </div>
 
       {/* Awards, Skills, FAQ */}
+      <div className="mb-6">
+        <label className="block text-lg font-semibold mb-2">Education</label>
+        {educations.map((education) => (
+          <div key={educations.id} className="flex items-center mb-2">
+            <input
+              type="text"
+              value={educations.value}
+              onChange={(e) =>
+                setEducation(educations.map((item) => (item.id === education.id ? { ...item, value: e.target.value } : item)))
+              }
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+            <button
+              onClick={() => handleRemoveField(education.id, setEducation, educations)}
+              className="ml-2 px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button onClick={() => handleAddField(setEducation, educations)} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+          Add Education
+        </button>
+      </div>
+
+
+      <div className="mb-6">
+        <label className="block text-lg font-semibold mb-2">Work Experience</label>
+        {works.map((work) => (
+          <div key={work.id} className="flex items-center mb-2">
+            <input
+              type="text"
+              value={work.value}
+              onChange={(e) =>
+                setWork(works.map((item) => (item.id === work.id ? { ...item, value: e.target.value } : item)))
+              }
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+            <button
+              onClick={() => handleRemoveField(work.id, setWork, works)}
+              className="ml-2 px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button onClick={() => handleAddField(setWork, works)} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+          Add Work
+        </button>
+      </div>
+
       <div className="mb-6">
         <label className="block text-lg font-semibold mb-2">Awards</label>
         {awards.map((award) => (

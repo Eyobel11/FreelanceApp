@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from '../utils/axios'; // Make sure you have axios configured for API calls
+import Swal from 'sweetalert2';
 
 function PostNewProject() {
   const [description, setDescription] = useState('');
@@ -83,11 +84,26 @@ function PostNewProject() {
           'Content-Type': 'multipart/form-data'
         }
       });
+
+      Swal.fire({
+        title: 'Job Posted!',
+        text: 'Your job has been posted successfully.',
+        icon: 'success',
+        confirmButtonColor: '#3E4B40',
+      });
+
       console.log('Job posted successfully:', response.data);
       // Optionally, reset the form or display a success message
     } catch (error) {
       console.error('Error posting job:', error.response?.data || error.message);
       // Optionally, display an error message to the user
+
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error posting your job. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+      });
     }
   };
 
@@ -115,14 +131,14 @@ function PostNewProject() {
               className="w-full border border-gray-300 rounded-lg p-3"
             >
               <option value="">Select Category</option>
-              <option value="business">Business</option>
-              <option value="designer">Designer</option>
-              <option value="digital-marketing">Digital Marketing</option>
-              <option value="lifestyle">Lifestyle</option>
-              <option value="programming-tech">Programming & Tech</option>
-              <option value="project-managers">Project Managers</option>
-              <option value="web-developers">Web Developers</option>
-              <option value="writing-translation">Writing & Translation</option>
+              <option>Business</option>
+              <option>Design</option>
+              <option>Digital Marketing</option>
+              <option>Lifestyle</option>
+              <option>Programming & Tech</option>
+              <option>Project Managment</option>
+              <option>Web Development</option>
+              <option>Writing & Translation</option>
             </select>
           </div>
           <div>

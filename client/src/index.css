@@ -32,7 +32,12 @@ html, body {
 
 }
 
-
+.image-add{
+  background-image: url(../src/assets/freelancer-detail.jpg)
+}
+.image-add2{
+  background-image: url(../src/assets/bg-filter3.jpg)
+}
 .back{
   background-color:#3E4B40;
   
@@ -94,7 +99,7 @@ html, body {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(50px);
   }
   to {
     opacity: 1;
@@ -103,11 +108,11 @@ html, body {
 }
 
 .fade-in-text {
-  animation: fadeIn 1s ease-in-out forwards;
+  animation: fadeIn 1.8s ease-in-out forwards;
 }
 
 .fade-in-image {
-  animation: fadeIn 1.2s ease-in-out forwards;
+  animation: fadeIn 1.8s ease-in-out forwards;
 }
 
 

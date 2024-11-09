@@ -10,16 +10,16 @@ const JobPostSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: [
-      'business', 
-      'designer', 
-      'digital-marketing', 
-      'lifestyle', 
-      'programming-tech', 
-      'project-managers', 
-      'web-developers', 
-      'writing-translation',
-    ],
+    // enum: [
+    //   'business', 
+    //   'designer', 
+    //   'digital-marketing', 
+    //   'lifestyle', 
+    //   'programming-tech', 
+    //   'project-managers', 
+    //   'web-developers', 
+    //   'writing-translation',
+    // ],
   },
   jobType: {
     type: String,

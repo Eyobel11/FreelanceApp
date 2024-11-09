@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { FaMapMarkerAlt, FaClock, FaGlobe, FaStar, FaUserCircle, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Navbar from "../Real DashBoard/Navbar";
 import Footer from "../Real DashBoard/Footer";
+import { useParams } from 'react-router-dom'; // To get userId from URL
+import axios from '../utils/axios';
+
 
 const ServiceShow = () => {
+
+  
   const images = [
     "https://via.placeholder.com/600x400", 
     "https://via.placeholder.com/600x400", 
@@ -19,25 +24,47 @@ const ServiceShow = () => {
     setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
+  const { userId: serviceId } = useParams(); 
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`/servicepost/view/${serviceId}`);
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    if (serviceId) {
+      fetchProfile();
+    }
+  }, [serviceId]);
+
+  if (!profile) {
+    return <p>Loading profile...</p>;
+  }
+
   return (
     <>
       <Navbar />
       <div className="container mx-auto p-4 mt-16">
         {/* Header Section */}
-        <div className="p-6 bg-orange-100">
-          <h1 className="text-3xl font-bold">I will design website UI UX in Adobe XD or Figma</h1>
+        <div className="p-14 image-add bg-cover bg-center">
+          <h1 className="text-3xl font-bold">{profile.title}</h1>
           <div className="flex items-center lg:space-x-6  sm:space-x-1 mt-4">
             <span className="flex items-center">
               <FaClock className="mr-2 text-gray-600" />
-              Delivery Time: 4 Days
+              Delivery Time: {profile.deliveryTime}
             </span>
             <span className="flex items-center">
               <FaGlobe className="mr-2 text-gray-600" />
-              English Level: Conversational
+              English Level: {profile.englishLevel}
             </span>
             <span className="flex items-center ">
               <FaMapMarkerAlt className="mr-2 text-gray-600 " />
-              Location: Los Angeles
+              Location: {profile.location}
             </span>
           </div>
         </div>
@@ -70,7 +97,7 @@ const ServiceShow = () => {
             <div className="flex items-center mb-4">
               <FaUserCircle className="text-6xl text-gray-600" />
               <div className="ml-4">
-                <h3 className="text-lg font-bold">John Doe</h3>
+                <h3 className="text-lg font-bold">{profile.fullName}</h3>
                 <p className="text-sm text-gray-500">Freelancer</p>
                 <p className="text-gray-600 mt-1">4.8 <FaStar className="inline text-yellow-500" /> (32 Reviews)</p>
               </div>
@@ -86,8 +113,7 @@ const ServiceShow = () => {
         <div className="mt-6 p-4">
           <h3 className="text-xl font-bold">Service Description</h3>
           <p className="text-gray-700 mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vehicula metus at libero
-            vehicula, et luctus felis blandit. Vivamus vehicula sodales est, eu rhoncus urna semper eu.
+          {profile.description}
           </p>
         </div>
 

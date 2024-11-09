@@ -3,9 +3,10 @@ import { Editor } from '@tinymce/tinymce-react';
 import axios from '../utils/axios'; // Make sure you have axios configured for API calls
 import { useParams } from 'react-router-dom';  // To get userId from URL
 import { useSelector } from 'react-redux';  // To get userId from Redux
+import Swal from 'sweetalert2';
+
 
 const ClientProfile = () => {
-
 
 
   // const { userId: paramUserId } = useParams();  // Get userId from route params
@@ -87,9 +88,23 @@ const ClientProfile = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
+      Swal.fire({
+        title: 'Profile Saved!',
+        text: 'Your profile has been saved successfully.',
+        icon: 'success',
+        confirmButtonColor: '#3E4B40',
+      });
+
       console.log('Profile saved successfully:', response.data);
     } catch (error) {
       console.error('Error saving profile:', error.response?.data || error.message);
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error saving your profile. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+      });
+      
     }
   };
 

@@ -30,7 +30,7 @@ const JobDetailDashClient = () => {
     <>
       <div className="min-h-screen bg-gray-50 ">
         {/* Job Header */}
-        <div className="bg-orange-50 py-10 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32 2xl:px-44 rounded-t-lg">
+        <div className="image-add bg-cover bg-center py-10 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32 2xl:px-44 rounded-t-lg">
           <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between">
             {/* Left Side: Job Info */}
             <div className="flex items-center mb-6 lg:mb-0">

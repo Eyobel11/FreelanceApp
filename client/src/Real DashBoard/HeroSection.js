@@ -1,7 +1,16 @@
 import React from "react";
 import homeimg from "../assets/78.png";
+import {useNavigate} from "react-router-dom"
 
 const HeroSection = () => {
+
+  const navigate = useNavigate();
+
+  const clickaway = () => {
+    window.scrollTo(0, 0); // Scrolls to the top of the page
+    navigate(`/registerDash`);
+  };
+
   return (
     <div className="relative min-h-screen lg:h-screen bg-cover bg-center back sm:pt-10" style={{ backgroundPosition: 'center', backgroundSize: 'cover', objectFit: 'cover' }}>
       {/* Ensure background doesn't overlap the navbar */}
@@ -27,17 +36,17 @@ const HeroSection = () => {
 
           {/* Buttons */}
           <div className="flex space-x-4">
-            <button className="bg-orange-200 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold hover:bg-green-700 transition-all duration-300 ease-in-out">
+            <button onClick = {clickaway} className="bg-orange-200 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold hover:bg-orange-100 transition-all duration-300 ease-in-out">
               Find Work
             </button>
-            <button className="bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold hover:bg-gray-800 hover:text-white transition-all duration-300 ease-in-out">
+            <button onClick = {clickaway} className="bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold hover:bg-gray-100 hover:text-black  transition-all duration-300 ease-in-out">
               Find Talent
             </button>
           </div>
         </div>
 
         {/* Right Section: Image */}
-        <div className="lg:w-1/2 mt-10 lg:mt-0">
+        <div className="lg:w-2/3 mt-10 lg:mt-0">
           <img src={homeimg} alt="Hero" className="rounded-lg fade-in-image" />
         </div>
       </div>

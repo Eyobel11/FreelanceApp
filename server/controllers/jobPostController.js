@@ -1,4 +1,5 @@
 // server/controllers/jobController.js
+const Notification = require('../models/Notification'); // Import Notification model
 
 const JobPost = require('../models/JobPost');
 const multer = require('multer');
@@ -91,6 +92,17 @@ const createJobPost = async (req, res) => {
   
       // Save the new job post to the database
       await newJob.save();
+
+      const notification = new Notification({
+        userId: req.user.id,
+        type: 'Post',
+        message: `Your job post "${title}" has been successfully created.`,
+        readStatus: false,
+        link: `/client/myjobs`
+      });
+      await notification.save();
+
+
       res.status(201).json(newJob);
     } catch (error) {
       console.error('Error creating job post:', error.message);
@@ -178,6 +190,19 @@ const updateJobPost = async (req, res) => {
   
       // Save the updated job post
       const updatedJob = await job.save();
+
+
+      const notification = new Notification({
+        userId: req.user.id,
+        type: 'Post',
+        message: `Your job post "${title}" has been successfully updated.`,
+        readStatus: false,
+        link: `/client/myjobs`
+      });
+
+      await notification.save();
+
+
       res.status(200).json(updatedJob);
     } catch (error) {
       console.error('Error updating job post:', error.message);
@@ -192,10 +217,33 @@ const deleteJobPost = async (req, res) => {
     if (!deletedJobPost) {
       return res.status(404).json({ message: 'Job post not found' });
     }
+
+    const notification = new Notification({
+      userId: req.user.id,
+      type: 'Post',
+      message: `Your job post "${deletedJobPost.title}" has been successfully deleted.`,
+      readStatus: false,
+      link: `/client/myjobs`
+    });
+    await notification.save();
+
+    
     res.status(200).json({ message: 'Job post deleted successfully' });
   } catch (error) {
     console.error('Error deleting job post:', error);
     res.status(500).json({ message: 'Error deleting job post' });
+  }
+};
+
+
+// Get job posts by client ID
+const getJobsByClient = async (req, res) => {
+  try {
+    const jobs = await JobPost.find({ user: req.params.clientId });
+    res.json(jobs);
+  } catch (error) {
+    console.error('Error fetching client jobs:', error);
+    res.status(500).json({ message: 'Error fetching client jobs' });
   }
 };
 
@@ -205,5 +253,6 @@ module.exports = {
   getJobPostById,
   updateJobPost,
   deleteJobPost,
+  getJobsByClient,
   upload
 };

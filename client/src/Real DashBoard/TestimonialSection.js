@@ -68,7 +68,7 @@ const TestimonialSection = () => {
 
                 {/* Right Section (Testimonial Text) */}
                 <div className="lg:w-1/2 w-full text-center lg:text-left">
-                  <h4 className="text-4xl font-bold text-black mb-4 animate-fade-in">{testimonial.company}</h4>
+                  <h4 className="text-4xl font-medium text-black mb-4 animate-fade-in">{testimonial.company}</h4>
                   <p className="text-xl text-gray-700 mb-6 w-full lg:w-2/3 animate-fade-in">{testimonial.text}</p>
                   <p className="text-gray-500 animate-fade-in">
                     {testimonial.name}

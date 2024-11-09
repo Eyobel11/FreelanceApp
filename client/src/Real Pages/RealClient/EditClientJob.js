@@ -118,7 +118,7 @@ const EditJob = () => {
         }
       });
       console.log('Job updated successfully');
-      navigate('/dashboardDash/client/myjobs'); // Redirect to My Jobs after updating
+      navigate('/client/myjobs'); // Redirect to My Jobs after updating
     } catch (error) {
       console.error('Error updating job:', error);
     }

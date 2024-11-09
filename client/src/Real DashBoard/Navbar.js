@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, Outlet } from 'react-router-dom';
+import image from "../assets/real logo.jpg"
 
 const Navbar = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -17,34 +18,35 @@ const Navbar = () => {
             {/* Left Side: Logo */}
             <div className="flex-shrink-0">
               <a href="/" className="text-2xl font-bold">Sera</a>
+              {/* <img src={image} /> */}
             </div>
 
             {/* Center: Menu Items (shown on larger screens) */}
             <div className="hidden md:flex space-x-4">
-              <a href="/" className="hover:text-gray-400 px-3 py-2 text-base font-medium">
+              <a href="/" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
                 Home
               </a>
-              <a href="/" className="hover:text-gray-400 px-3 py-2 text-base font-medium">
-                Browse Jobs
+              <a href="#services" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
+                Browse Services
               </a>
-              <a href="/" className="hover:text-gray-400 px-3 py-2 text-base font-medium">
-                Users
+              <a href="#freelancers" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
+                Freelancers
               </a>
-              <a href="/" className="hover:text-gray-400 px-3 py-2 text-base font-medium">
+              <a href="/" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
                 Blog
               </a>
-              <a href="/" className="hover:text-gray-400 px-3 py-2 text-base font-medium">
-                Pages
-              </a>
+              <Link to="/contact" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
+                Contact
+              </Link>
             </div>
 
             {/* Right Side: Sign In & Join Buttons (shown on larger screens) */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link to = "/loginDash" className="bg-transparent border-2 border-white hover:bg-gray-800 text-white px-8 py-2 rounded-3xl text-base font-medium transition duration-300">
+              <Link to = "/loginDash" className="bg-transparent border-2 border-white hover:bg-gray-100 hover:text-black text-white px-8 py-2 rounded-3xl text-base font-medium transition duration-300">
                 Sign In
               </Link>
 
-              <Link to = "/registerDash" className="bg-orange-200 hover:bg-green-700 text-gray-900 px-7 py-2 rounded-3xl text-base font-bold">
+              <Link to = "/registerDash" className="bg-orange-200 hover:bg-orange-100 text-gray-900 px-7 py-2 rounded-3xl text-base font-bold">
                 Join
               </Link>
             </div>
@@ -101,7 +103,7 @@ const Navbar = () => {
           </li>
           <li>
             <a href="/" className="block px-3 py-2 text-gray-700 hover:bg-gray-200 rounded">
-              Pages
+              Contact
             </a>
           </li>
         </ul>

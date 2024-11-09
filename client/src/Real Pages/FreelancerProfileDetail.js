@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaMapMarkerAlt, FaClock, FaStar, FaEnvelope, FaPhone, FaUserCircle, FaBriefcase, FaCalendarAlt, FaLanguage, FaTransgender } from 'react-icons/fa';
 import Footer from '../Real DashBoard/Footer';
 import Navbar from '../Real DashBoard/Navbar';
+import { useParams } from 'react-router-dom'; // To get userId from URL
+import { useSelector } from 'react-redux'; // To get userId from Redux
+import axios from '../utils/axios';
 
 const FreelancerProfileDetail = () => {
+
+  const { userId: freelancerId } = useParams(); 
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`/freelancerprofile/view/${freelancerId}`);
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    if (freelancerId) {
+      fetchProfile();
+    }
+  }, [freelancerId]);
+
+  if (!profile) {
+    return <p>Loading profile...</p>;
+  }
+
   return (
     <>
     <Navbar />
@@ -18,16 +44,16 @@ const FreelancerProfileDetail = () => {
             className="w-32 h-32 lg:w-48 lg:h-48 rounded-full object-cover mr-6"
           />
           <div>
-            <h1 className="text-3xl font-bold">Agent Pakulla</h1>
-            <p className="text-lg mt-2">Nursing Assistant</p>
+          <h1 className="text-3xl font-bold">{profile.fullName}</h1>
+          <p className="text-lg mt-2">{profile.jobTitle}</p>
             <div className="flex items-center space-x-6 mt-4">
               <span className="flex items-center">
                 <FaCalendarAlt className="mr-2 text-gray-600" />
-                DOB: January 1, 1990
+                DOB: {profile.dob}
               </span>
               <span className="flex items-center">
                 <FaMapMarkerAlt className="mr-2 text-gray-600" />
-                Location: New York
+                Location: {profile.location}
               </span>
               <span className=" px-3 py-1 rounded-full text-sm">
                 ⭐ 4.9 (52 Reviews)
@@ -53,17 +79,14 @@ const FreelancerProfileDetail = () => {
           {/* About Me Section */}
           <div className=" p-6">
             <h3 className="text-2xl font-bold mb-4">About Me</h3>
-            <p>
-              I am a Nursing Assistant with over 10 years of experience in providing patient care and healthcare services. 
-              I have worked in various healthcare settings and excel in delivering compassionate and professional care. 
-              My passion for healthcare has led me to continuously improve my skills and ensure that I am always at the forefront of best practices.
-            </p>
+            <p>{profile.description}</p>
           </div>
 
           {/* Education Section */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-xl font-bold mb-4">Education</h3>
             <ul className="list-disc ml-5">
+              <li>{profile.educations}</li>
               <li>Bachelor of Nursing - XYZ University, 2012</li>
               <li>Master of Healthcare Management - ABC University, 2015</li>
             </ul>
@@ -73,6 +96,7 @@ const FreelancerProfileDetail = () => {
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-2xl font-bold mb-4">Work Experience</h3>
             <ul className="list-disc ml-5">
+              <li>{profile.works}</li>
               <li>Senior Nursing Assistant at XYZ Hospital, 2015-Present</li>
               <li>Healthcare Consultant, Freelance, 2018-Present</li>
             </ul>
@@ -82,6 +106,7 @@ const FreelancerProfileDetail = () => {
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-2xl font-bold mb-4">Awards</h3>
             <ul className="list-disc ml-5">
+            <li>{profile.awards}</li>
               <li>Best Healthcare Assistant Award, 2019</li>
               <li>Outstanding Nursing Services Award, 2020</li>
             </ul>
@@ -203,54 +228,48 @@ const FreelancerProfileDetail = () => {
             <ul className="space-y-4">
               <li className="flex items-center">
                 <FaBriefcase className="text-gray-500 mr-2" />
-                $60 - $65 / hr
+                {profile.minRate} - {profile.maxRate} / hr
               </li>
               <li className="flex items-center">
                 <FaMapMarkerAlt className="text-gray-500 mr-2" />
-                Location: New York
+                Location: {profile.location}
               </li>
               <li className="flex items-center">
                 <FaUserCircle className="text-gray-500 mr-2" />
-                Type: Agency Freelancers
+                Type: {profile.freelancerType}
               </li>
               <li className="flex items-center">
                 <FaLanguage className="text-gray-500 mr-2" />
-                English Level: Professional
+                English Level: {profile.englishLevel || 'Not specified'}
               </li>
               <li className="flex items-center">
                 <FaTransgender className="text-gray-500 mr-2" />
-                Gender: Male
+                Gender: {profile.gender}
               </li>
               <li className="flex items-center">
                 <FaEnvelope className="text-gray-500 mr-2" />
-                Email: agentpakulla@apus.com
+                Email: {profile.email}
               </li>
               <li className="flex items-center">
                 <FaPhone className="text-gray-500 mr-2" />
-                Phone Number: (+88) 123-456-789
+                Phone Number: {profile.phone}
               </li>
             </ul>
           </div>
 
           {/* Skills Section */}
+          
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-4">Skills</h3>
-            <div className="flex flex-wrap">
-              <span className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
-                Patient Care
-              </span>
-              <span className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
-                Nursing
-              </span>
-              <span className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
-                CPR
-              </span>
-              <span className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
-                Medical Assistance
-              </span>
-            </div>
-          </div>
-
+                   <h3 className="text-xl font-bold mb-4">Skills</h3>
+                   <div className="flex flex-wrap">
+                     {profile.skills ? profile.skills.map((skill, index) => (
+                       <span key={index} className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
+                         {skill}
+                       </span>
+                     )) : <p>No skills listed</p>}
+                   </div>
+                 </div>
+                    
         </div>
 
       </div>

@@ -1,9 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
 import { FaMapMarkerAlt, FaCalendarAlt, FaDollarSign, FaBriefcase } from "react-icons/fa";
 import Navbar from "../Real DashBoard/Navbar";
 import Footer from "../Real DashBoard/Footer";
+import { Link, useParams } from 'react-router-dom'; // To get userId from URL
+import axios from '../utils/axios';
+
 
 const JobDetailDash = () => {
+
+  const { userId: jobId } = useParams(); 
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`/jobpost/${jobId}`);
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    if (jobId) {
+      fetchProfile();
+    }
+  }, [jobId]);
+
+  if (!profile) {
+    return <p>Loading profile...</p>;
+  }
+
   return (
     <>
       <Navbar />
@@ -19,12 +45,12 @@ const JobDetailDash = () => {
                 className="w-20 h-20 rounded-full mr-6"
               />
               <div>
-                <h1 className="text-2xl font-bold">Senior/ Staff Nurse</h1>
-                <p className="text-green-600">Upwork</p>
+                <h1 className="text-2xl font-bold">{profile.title}</h1>
+                <p className="text-green-600">{profile.category}</p>
                 <div className="flex items-center gap-5 flex-wrap">
-                  <p className="text-gray-500">$50 - $100 / week</p>
-                  <p className="text-gray-500">Business, Developers</p>
-                  <p className="text-gray-500">Full Time</p>
+                  <p className="text-gray-500">${profile.minPrice} - ${profile.maxPrice} / week</p>
+                  <p className="text-gray-500">{profile.jobLocationType}</p>
+                  <p className="text-gray-500">{profile.jobType}</p>
                 </div>
               </div>
             </div>
@@ -33,9 +59,9 @@ const JobDetailDash = () => {
             <div className="text-right">
               <p className="text-gray-500 mb-2">Application ends:</p>
               <p className="font-bold mb-4">October 7, 2029</p>
-              <button className="bg-green-900 hover:bg-green-950 text-white px-6 py-3 md:px-10 md:py-4 rounded-md">
+              <Link to={`/submit-proposal/${jobId}`} className="bg-green-900 hover:bg-green-950 text-white px-6 py-3 md:px-10 md:py-4 rounded-md">
                 Apply Now
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -49,28 +75,28 @@ const JobDetailDash = () => {
               <FaCalendarAlt className="text-green-900 mr-4" />
               <div>
                 <p className="font-semibold">Date Posted</p>
-                <p className="text-gray-500">October 7, 2022</p>
+                <p className="text-gray-500">{profile.createdAt}</p>
               </div>
             </div>
             <div className="flex items-center">
               <FaMapMarkerAlt className="text-green-900 mr-4" />
               <div>
                 <p className="font-semibold">Location</p>
-                <p className="text-gray-500">New York</p>
+                <p className="text-gray-500">{profile.location}</p>
               </div>
             </div>
             <div className="flex items-center">
               <FaDollarSign className="text-green-900 mr-4" />
               <div>
                 <p className="font-semibold">Offered Salary</p>
-                <p className="text-gray-500">$50 - $100 / week</p>
+                <p className="text-gray-500">${profile.minPrice} - ${profile.maxPrice} / week</p>
               </div>
             </div>
             <div className="flex items-center">
               <FaBriefcase className="text-green-900 mr-4" />
               <div>
                 <p className="font-semibold">Experience</p>
-                <p className="text-gray-500">1 Year</p>
+                <p className="text-gray-500">{profile.experienceLevel}</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -84,21 +110,21 @@ const JobDetailDash = () => {
               <FaBriefcase className="text-green-900 mr-4" />
               <div>
                 <p className="font-semibold">Industry</p>
-                <p className="text-gray-500">Management</p>
+                <p className="text-gray-500">{profile.category}</p>
               </div>
             </div>
             <div className="flex items-center">
               <FaBriefcase className="text-green-900 mr-4" />
               <div>
-                <p className="font-semibold">Qualification</p>
-                <p className="text-gray-500">Associate Degree</p>
+                <p className="font-semibold">English</p>
+                <p className="text-gray-500">{profile.englishLevel}</p>
               </div>
             </div>
             <div className="flex items-center">
               <FaBriefcase className="text-green-900 mr-4" />
               <div>
-                <p className="font-semibold">Career Level</p>
-                <p className="text-gray-500">Officer</p>
+                <p className="font-semibold">Website</p>
+                <p className="text-gray-500">{profile.website}</p>
               </div>
             </div>
           </div>
@@ -107,10 +133,7 @@ const JobDetailDash = () => {
           <div className="mb-6">
             <h2 className="text-xl font-bold mb-4">Job Description</h2>
             <p className="text-gray-600">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla scelerisque, velit nec
-              volutpat ultricies, eros purus consequat massa, vitae vehicula turpis nunc eget nunc.
-              Etiam imperdiet velit ex, eget tempus risus hendrerit non. Suspendisse lobortis libero
-              vitae neque lacinia, et volutpat felis ornare.
+            {profile.description}
             </p>
           </div>
         </div>

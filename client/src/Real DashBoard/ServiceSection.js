@@ -1,5 +1,7 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import { FaCode, FaPaintBrush, FaBullhorn, FaPenNib, FaMusic, FaFilm, FaLaptopCode, FaCalculator } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+
 
 const services = [
   { title: 'Development & IT', count: 9, icon: <FaCode /> },
@@ -13,10 +15,19 @@ const services = [
 ];
 
 const ServicesSection = () => {
+  const navigate = useNavigate();
+
+ 
+
+  const handleFreelancerClick = () => {
+    window.scrollTo(0, 0); // Scrolls to the top of the page
+    navigate(`/servicelist`);
+  };
+
   return (
     <section className="py-12 bg-white mt-24 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-extrabold text-gray-900 mb-8 text-center sm:text-left">
+        <h2 className="text-3xl font-semibold text-gray-900 mb-8 text-center sm:text-left">
           Browse Talent by Category
         </h2>
         <p className="text-gray-500 mb-12 text-center sm:text-left">
@@ -24,7 +35,7 @@ const ServicesSection = () => {
         </p>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" onClick={handleFreelancerClick}>
           {services.map((service, index) => (
             <div
               key={index}
@@ -35,7 +46,7 @@ const ServicesSection = () => {
                 <div className="flex justify-center items-center mb-4">
                   <span className="text-4xl text-orange-200">{service.icon}</span> {/* Larger Icon */}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {service.title.split(' & ')[0]} <br /> & {service.title.split(' & ')[1]}
                 </h3>
                 <p className="text-gray-500">

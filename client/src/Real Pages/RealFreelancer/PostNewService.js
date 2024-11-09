@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from '../utils/axios'; // Import Axios for API call
+import Swal from 'sweetalert2';
 
 function PostNewService() {
+  const [profileImage, setProfileImage] = useState(null);
+  const [fullName, setFullName] = useState('');
+  const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -37,6 +41,8 @@ function PostNewService() {
     formData.append('servicePrice', servicePrice);
     formData.append('englishLevel', englishLevel);
     formData.append('description', description);
+    formData.append('fullName', fullName);
+    formData.append('location', location);
 
     // Append files
     if (featuredImage) {
@@ -46,6 +52,10 @@ function PostNewService() {
       for (const file of gallery) {
         formData.append('gallery', file);
       }
+
+    if (profileImage) {
+        formData.append('profileImage', profileImage);
+      }
     }
 
     try {
@@ -54,9 +64,23 @@ function PostNewService() {
           'Content-Type': 'multipart/form-data'
         }
       });
+      Swal.fire({
+        title: 'Service Posted!',
+        text: 'Your service has been posted successfully.',
+        icon: 'success',
+        confirmButtonColor: '#3E4B40',
+      });
       console.log('Service posted successfully:', response.data);
       // Optionally reset the form or display a success message
     } catch (error) {
+
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error posting your service. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+      });
+
       console.error('Error posting service:', error.response?.data || error.message);
     }
   };
@@ -66,7 +90,35 @@ function PostNewService() {
       {/* General Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Post a New Service</h2>
+        {/* Profile Image */}
+      <div className="mb-6">
+        <label className="block text-lg font-semibold mb-2">Profile Image</label>
+        <input type="file" onChange={(e) => setProfileImage(e.target.files[0])} className="block w-full" />
+      </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <label className="block mb-2 font-medium">Full Name</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+              placeholder="Service title..."
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 font-medium">Location</label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+              placeholder="Service title..."
+            />
+          </div>
+          
+          
           <div>
             <label className="block mb-2 font-medium">Title</label>
             <input
@@ -85,16 +137,16 @@ function PostNewService() {
               className="w-full border border-gray-300 rounded-lg p-3"
             >
               <option value="">Select Category</option>
-              <option value="programming-tech">Programming & Tech</option>
-              <option value="graphic-and-design">Graphics & Design</option>
-              <option value="content-writing">Writing & Translation</option>
-              <option value="digital-marketing">Digital Marketing</option>
-              <option value="business">Business</option>
-              <option value="lifestyle">Lifestyle</option>
-              <option value="music-audio">Music & Audio</option>
-              <option value="video-animation">Video & Animation</option>
-              <option value="video-animation">Development & IT</option>
-              <option value="finance-and-accounting">Finance & Accounting</option>
+              <option>Programming & Tech</option>
+              <option>Graphics & Design</option>
+              <option>Writing & Translation</option>
+              <option>Digital Marketing</option>
+              <option>Business</option>
+              <option>Lifestyle</option>
+              <option>Music & Audio</option>
+              <option>Video & Animation</option>
+              <option>Development & IT</option>
+              <option>Finance & Accounting</option>
 
             </select>
           </div>
@@ -142,9 +194,9 @@ function PostNewService() {
               className="w-full border border-gray-300 rounded-lg p-3"
             >
               <option value="">Select Category</option>
-              <option value="fluent">Fluent</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="basic">Basic</option>
+              <option>Fluent</option>
+              <option>Intermediate</option>
+              <option>Basic</option>
             </select>
           </div>
         </div>

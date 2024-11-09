@@ -18,8 +18,8 @@ const FreelancerProfileSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
+    unique:true
   },
   phone: {
     type: String,
@@ -47,6 +47,7 @@ const FreelancerProfileSchema = new mongoose.Schema({
   },
   dob: {
     type: Date,
+    default: Date.now(),
   },
   freelancerType: {
     type: String,
@@ -76,6 +77,18 @@ const FreelancerProfileSchema = new mongoose.Schema({
     trim: true,
   },
   awards: [
+    {
+      type: String,
+      trim: true,
+    }
+  ],
+  educations: [
+    {
+      type: String,
+      trim: true,
+    }
+  ],
+  works: [
     {
       type: String,
       trim: true,

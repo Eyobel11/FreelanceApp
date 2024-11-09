@@ -7,6 +7,7 @@ const { Server } = require('socket.io');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const Message = require('./models/Message'); // Import the Message model
 
 // Load environment variables
 dotenv.config();
@@ -26,7 +27,6 @@ if (!fs.existsSync(uploadDirs)) {
   fs.mkdirSync(uploadDirs, { recursive: true });
   console.log('Uploads attachments directory created:', uploadDirs);
 }
-
 
 if (!fs.existsSync(uploadDirJob)) {
   fs.mkdirSync(uploadDirJob, { recursive: true });
@@ -59,55 +59,120 @@ const io = new Server(server, {
   }
 });
 
-// Socket.IO events
+global.onlineUsers = {};
+
+
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  socket.on('sendMessage', (message) => {
-    console.log('Message received:', message);
-    io.emit('receiveMessage', message); // Broadcast to all clients
+  socket.on('registerUser', (userId) => {
+    global.onlineUsers[userId] = socket.id;
   });
 
-  socket.on('sendNotification', (notification) => {
-    io.emit('receiveNotification', notification); // Broadcast notifications to all clients
+  socket.on('sendMessage', async (message) => {
+    try {
+      console.log('Received message:', message); // Log the message to see the incoming data
+  
+      // Validate and convert senderId and receiverId to ObjectId
+      if (mongoose.Types.ObjectId.isValid(message.senderId)) {
+        message.senderId = new mongoose.Types.ObjectId(message.senderId);
+      } else {
+        throw new Error('Invalid senderId');
+      }
+  
+      if (mongoose.Types.ObjectId.isValid(message.receiverId)) {
+        message.receiverId = new mongoose.Types.ObjectId(message.receiverId);
+      } else {
+        throw new Error('Invalid receiverId');
+      }
+  
+      const newMessage = new Message(message);
+      const savedMessage = await newMessage.save();
+  
+      // Notify the receiver if they are online
+      const receiverSocketId = global.onlineUsers[message.receiverId];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit('receiveMessage', savedMessage);
+  
+        // Update message status to 'delivered'
+        savedMessage.status = 'delivered';
+        await savedMessage.save();
+      }
+  
+      // Notify sender about the message status update
+      socket.emit('messageStatus', { messageId: savedMessage._id, status: 'delivered' });
+  
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  });
+  
+
+  socket.on('messageRead', async (messageId) => {
+    try {
+      // Update the message status to 'read'
+      const message = await Message.findByIdAndUpdate(messageId, { status: 'read' }, { new: true });
+
+      if (message) {
+        const senderSocketId = global.onlineUsers[message.senderId];
+        if (senderSocketId) {
+          io.to(senderSocketId).emit('messageStatus', { messageId: message._id, status: 'read' });
+        }
+      }
+    } catch (error) {
+      console.error('Error updating message status:', error);
+    }
   });
 
   socket.on('disconnect', () => {
+    const userId = Object.keys(global.onlineUsers).find(key => global.onlineUsers[key] === socket.id);
+    if (userId) {
+      delete global.onlineUsers[userId];
+    }
     console.log('User disconnected:', socket.id);
   });
 });
 
+
 // Define Routes
 const authRoutes = require('./routes/authRoutes');
-const jobRoutes = require('./routes/jobRoutes');
-const bidRoutes = require('./routes/bidRoutes');
-const freelancerRoutes = require('./routes/freelancerRoutes');
+
+
 const messageRoutes = require('./routes/messageRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
-const profileRoutes = require('./routes/profileRoutes');
-const portfolioRoutes = require('./routes/portfolioRoutes');
+
+
 const notificationRoutes = require('./routes/notificationRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
+
 const clientprofileRoutes = require('./routes/clientProfileRoutes');
 const jobPostRoutes = require('./routes/jobPostRoutes');
 const freelancerprofileRoutes = require('./routes/freelancerProfileRoutes');
-const servicePostRoutes = require('./routes/servicePostRoutes')
+const servicePostRoutes = require('./routes/servicePostRoutes');
+const emailRoutes = require('./routes/emailRoutes'); // Import the email routes
+const proposalRoutes = require('./routes/proposalRoutes');
+const messageJobRoutes = require('./routes/messageJobRoutes');
+
+const messagingRoutes = require('./routes/messagingRoutes');
+ 
 
 // Routes middleware
-app.use('/api/profile', profileRoutes);
+
 app.use('/api/clientprofile', clientprofileRoutes);
-app.use('/api/freelancerprofile', freelancerprofileRoutes)
-app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/freelancerprofile', freelancerprofileRoutes);
+
 app.use('/api/auth', authRoutes);
-app.use('/api/jobs', jobRoutes);
-app.use('/api/bids', bidRoutes);
-app.use('/api/freelancers', freelancerRoutes);
-app.use('/api/messages', messageRoutes);
+
+app.use('/api/message', messageRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/reviews', reviewRoutes);
+
 app.use('/api/jobpost', jobPostRoutes);
 app.use('/api/servicepost', servicePostRoutes);
+app.use('/api/email', emailRoutes);
+app.use('/api/proposals', proposalRoutes);
+app.use('/api/messagesjob', messageJobRoutes);
+app.use('/api/messaging', messagingRoutes);
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({

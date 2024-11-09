@@ -40,16 +40,16 @@ const ClientProfileSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: [
-      'business',
-      'designer',
-      'digital-marketing',
-      'lifestyle',
-      'programming-tech',
-      'project-managers',
-      'web-developers',
-      'writing-translation',
-    ],
+    // enum: [
+    //   'business',
+    //   'designer',
+    //   'digital-marketing',
+    //   'lifestyle',
+    //   'programming-tech',
+    //   'project-managers',
+    //   'web-developers',
+    //   'writing-translation',
+    // ],
   },
   friendlyAddress: {
     type: String,
@@ -77,19 +77,19 @@ const ClientProfileSchema = new mongoose.Schema({
   website: {
     type: String,
     trim: true,
-    match: [
-      /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/,
-      'is invalid',
-    ],
+    // match: [
+    //   /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/,
+    //   'is invalid',
+    // ],
   },
   foundedDate: {
     type: Number, // Year founded
-    min: [1900, 'Founded year must be after 1900'],
-    max: [new Date().getFullYear(), 'Founded year cannot be in the future'],
+    // min: [1900, 'Founded year must be after 1900'],
+    // max: [new Date().getFullYear(), 'Founded year cannot be in the future'],
   },
   employees: {
     type: Number,
-    min: [1, 'Must have at least one employee'],
+    // min: [1, 'Must have at least one employee'],
   },
   responseTime: {
     type: String,

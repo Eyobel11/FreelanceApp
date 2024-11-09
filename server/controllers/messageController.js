@@ -1,39 +1,58 @@
 const Message = require('../models/Message');
+const io = require('../server').io; // Export io from the main server
 
-// Fetch messages by jobId (including threaded replies)
+// Fetch messages by jobId (including their statuses)
 exports.getMessagesByJob = async (req, res) => {
   const { jobId } = req.params;
 
   try {
-    // Fetch messages with their replies
-    const messages = await Message.find({ jobId, parentId: null }).sort({ createdAt: 1 }).lean();
-
-    // Fetch replies for each message
-    for (let message of messages) {
-      message.replies = await Message.find({ parentId: message._id }).sort({ createdAt: 1 });
-    }
-
+    const messages = await Message.find({ jobId }).sort({ createdAt: 1 }).lean();
     res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
   }
 };
 
-// Create new message (with attachment support)
+// Create a new message
 exports.createMessage = async (req, res) => {
-  const { senderId, jobId, message, parentId, attachmentUrl } = req.body;
+  const { senderId, receiverId, jobId, message, parentId, attachmentUrl } = req.body;
 
   try {
     const newMessage = new Message({
       senderId,
+      receiverId,
       jobId,
       message,
-      parentId,   // Replying to another message if parentId exists
+      parentId,
       attachmentUrl,
+      status: 'sent' // Default to 'sent' when creating a new message
     });
 
     const savedMessage = await newMessage.save();
+
+    // Notify the receiver if they are online
+    const receiverSocketId = global.onlineUsers[receiverId];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('receiveMessage', savedMessage);
+    }
+
     res.status(201).json(savedMessage);
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+};
+
+// Update message status (to 'delivered' or 'read')
+exports.updateMessageStatus = async (req, res) => {
+  const { messageId, status } = req.body;
+
+  try {
+    const message = await Message.findByIdAndUpdate(messageId, { status }, { new: true });
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    res.status(200).json(message);
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
   }

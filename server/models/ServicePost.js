@@ -8,6 +8,11 @@ const serviceSchema = new Schema({
     required: true,
     trim: true,
   },
+  
+  profileImage: {
+    type: String, // URL or file path for the profile image
+  },
+
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -36,6 +41,18 @@ const serviceSchema = new Schema({
     required: true,
     // enum: ['Fluent', 'Intermediate', 'Basic'], // Possible values for English proficiency
   },
+
+  fullName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+
+  location: {
+    type: String,
+    trim: true,
+  },
+
   description: {
     type: String,
     required: true,
