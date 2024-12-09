@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: ['http://localhost:5000/api', 'https://freelanceapp-backend.onrender.com/api'],
+  baseURL:  'https://freelanceapp-backend.onrender.com/api',
 });
 
 // Add token to headers if it exists
