@@ -80,6 +80,13 @@ const FreelancerProfile = () => {
   };
 
   const handleSaveProfile = async () => {
+
+
+    const sanitizedEducations = educations.map((item) => item.value.trim()).filter(Boolean);
+    const sanitizedWorks = works.map((item) => item.value.trim()).filter(Boolean);
+    const sanitizedAwards = awards.map((item) => item.value.trim()).filter(Boolean);
+    const sanitizedSkills = skills.map((item) => item.value.trim()).filter(Boolean);
+  
     const formData = new FormData();
     formData.append('fullName', fullName);
     formData.append('email', email);
@@ -95,10 +102,10 @@ const FreelancerProfile = () => {
     formData.append('category', category);
     formData.append('friendlyAddress', friendlyAddress);
     formData.append('videoUrl', videoUrl);
-    formData.append('educations', JSON.stringify(educations.map((educations) => educations.value)));
-    formData.append('works', JSON.stringify(works.map((works) => works.value)));
-    formData.append('awards', JSON.stringify(awards.map((award) => award.value)));
-    formData.append('skills', JSON.stringify(skills.map((skill) => skill.value)));
+    formData.append('educations', sanitizedEducations);
+    formData.append('works', sanitizedWorks);
+    formData.append('awards',sanitizedAwards );
+    formData.append('skills', sanitizedSkills);
     formData.append('faqs', JSON.stringify(faqs.map((faq) => faq.value)));
 
     if (profileImage) {

@@ -7,6 +7,7 @@ import { FiUserPlus, FiEye, FiEyeOff } from 'react-icons/fi'; // For the registe
 import { FaUserTie, FaUserNinja } from 'react-icons/fa'; // For freelancer and employer icons
 import { useDispatch } from 'react-redux'; // Import useDispatch from redux
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import Swal from 'sweetalert2';
 
 const RegisterDash = () => {
   const [role, setRole] = useState('Freelancer'); // default role
@@ -76,7 +77,14 @@ const RegisterDash = () => {
 
       localStorage.setItem('token', data.token); // Save token in localStorage
       console.log('Registration successful:', data);
-      alert('Registration successful')
+
+      Swal.fire({
+        title: 'Registered!',
+        text: 'You have been successfully registered.',
+        icon: 'success',
+        confirmButtonColor: '#3E4B40',
+      });
+      
       navigate('/loginDash')
       // You can redirect the user or show a success message here
     } catch (error) {

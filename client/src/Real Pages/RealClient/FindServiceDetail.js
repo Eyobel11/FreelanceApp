@@ -8,11 +8,11 @@ import axios from '../utils/axios';
 const FindServiceShow = () => {
 
   
-  const images = [
-    "https://via.placeholder.com/600x400", 
-    "https://via.placeholder.com/600x400", 
-    "https://via.placeholder.com/600x400"
-  ];
+  // const images = [
+  //   "https://via.placeholder.com/600x400", 
+  //   "https://via.placeholder.com/600x400", 
+  //   "https://via.placeholder.com/600x400"
+  // ];
   const [current, setCurrent] = useState(0);
 
   const nextImage = () => {
@@ -28,9 +28,14 @@ const FindServiceShow = () => {
   const clientId = useSelector((state) => state.auth.user._id);
 
   const [freelancerId, setFreelancerId] = useState(null); // State to hold FreelancerProfile ID
+  const [jobs, setJobs] = useState({}); // State to hold
  
 
   const [profile, setProfile] = useState(null);
+  const images = profile 
+  ? [profile.featuredImage, ...profile.gallery]
+  : ["https://via.placeholder.com/600x400"];
+  
 
   // Fetch ServicePost and corresponding FreelancerProfile
   
@@ -39,13 +44,17 @@ const FindServiceShow = () => {
       try {
         const response = await axios.get(`/servicepost/view/${serviceId}`);
         setProfile(response.data);
+        
 
-        // Fetch FreelancerProfile using the user._id from ServicePost
-        const userId = response.data.user?._id || response.data.user;
-        if (userId) {
-          const freelancerResponse = await axios.get(`/freelancerprofile/${userId}`);
-          setFreelancerId(freelancerResponse.data._id); // Save the freelancer's profile ID
+        
+        if (response.data.user && response.data.user._id) {
+          const jobsResponse = await axios.get(`/freelancerprofile/${response.data.user._id}`);
+          setJobs(jobsResponse.data);
+         
         }
+
+      
+
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -65,9 +74,11 @@ const FindServiceShow = () => {
     }
   };
 
-  // Handle message initiation
   const handleMessageMe = async () => {
     const freelancersId = profile.user._id || profile.user;
+    const clientName = profile.clientName; // Add clientName
+    const freelancerName = profile.freelancerName; // Add freelancerName
+  
     if (freelancersId && clientId) {
       try {
         const response = await axios.post('/messaging/send', {
@@ -75,7 +86,9 @@ const FindServiceShow = () => {
           freelancersId,
           clientId,
           senderId: clientId,
-          content: `Hello, I am interested in your ${profile.title} service.`
+          content: `Hello, I am interested in your ${profile.title} service.`,
+          clientName,
+          freelancerName,
         });
         const threadId = response.data._id;
         navigate(`/messages/thread/${threadId}`);
@@ -113,7 +126,9 @@ const FindServiceShow = () => {
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Image Carousel */}
           <div className="lg:col-span-2 relative">
-            <img src={images[current]} alt="Gig Work" className="w-full h-auto object-cover rounded-lg" />
+            <img
+              src={`http://localhost:5000${images[current]}`}
+              alt="Gig Work" className="w-full h-auto object-cover rounded-lg" />
             <button onClick={prevImage} className="absolute top-1/2 left-0 bg-gray-200 p-2 transform -translate-y-1/2">
               <FaChevronLeft />
             </button>
@@ -124,7 +139,7 @@ const FindServiceShow = () => {
               {images.map((img, idx) => (
                 <img
                   key={idx}
-                  src={img}
+                  src={`http://localhost:5000${img}`}
                   alt={`Thumbnail ${idx}`}
                   className={`w-20 h-16 object-cover cursor-pointer rounded-lg ${current === idx ? 'border-2 border-green-500' : 'border'}`}
                   onClick={() => setCurrent(idx)}
@@ -140,12 +155,14 @@ const FindServiceShow = () => {
               <div className="ml-4">
                 <h3 className="text-lg font-medium hover:underline cursor-pointer" onClick={handleContactMe} >{profile.fullName}</h3>
                 <p className="text-sm text-gray-500">Freelancer</p>
-                <p className="text-gray-600 mt-1">4.8 <FaStar className="inline text-yellow-500" /> (32 Reviews)</p>
+                <p className="text-gray-600 mt-1">0 <FaStar className="inline text-yellow-500" /> (0 Reviews)</p>
               </div>
             </div>
-            <p className="text-gray-700 mb-4">
-              I am a UI/UX designer with over 5 years of experience in creating designs that meet client needs. Contact me for customized services.
-            </p>
+            
+            <div
+                className="text-gray-700 mb-4"
+                dangerouslySetInnerHTML={{ __html: jobs.description }}
+              ></div>
             <button onClick={handleMessageMe} className="bg-green-900 text-white py-2 px-4 rounded-lg w-full  hover:bg-green-950">Contact Me</button>
 
           </div>
@@ -154,9 +171,12 @@ const FindServiceShow = () => {
         {/* Service Description Section */}
         <div className="mt-6 p-4">
           <h3 className="text-xl font-medium">Service Description</h3>
-          <p className="text-gray-700 mt-2">
-          {profile.description}
-          </p>
+          <div
+                className="text-gray-700 mt-2"
+                dangerouslySetInnerHTML={{ __html: profile.description }}
+              ></div>
+
+          
         </div>
 
         {/* Reviews Section */}
@@ -167,14 +187,14 @@ const FindServiceShow = () => {
             <div className="bg-orange-100 p-4 rounded-lg">
               <p className="font-semibold">Admin</p>
               <p className="text-yellow-500">⭐⭐⭐⭐☆</p>
-              <p className="text-gray-600">Lorem ipsum dolor sit amet, consectetur.</p>
+              <p className="text-gray-600">Keep up the good work.</p>
             </div>
 
             {/* Review 2 */}
             <div className="bg-orange-100 p-4 rounded-lg">
-              <p className="font-semibold">Ali Tufan</p>
+              <p className="font-semibold">Eyobel</p>
               <p className="text-yellow-500">⭐⭐⭐⭐⭐</p>
-              <p className="text-gray-600 ">Vivamus vehicula sodales est, eu rhoncus urna semper eu.</p>
+              <p className="text-gray-600 ">Great job.</p>
             </div>
           </div>
 

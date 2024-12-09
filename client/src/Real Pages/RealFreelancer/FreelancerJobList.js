@@ -197,7 +197,7 @@ const FreelancerJobListDash = () => {
                     <p className="text-gray-600">{job.location}</p>
                   </div>
                   <div className="flex items-center mt-4">
-                    <p className="text-sm text-gray-500">Posted {job.createdAt}</p>
+                    <p className="text-sm text-gray-500">Posted {new Date(job.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div className="flex items-center justify-end mt-4">
                     <p className="font-medium text-lg">${job.minPrice}-{job.maxPrice}</p>

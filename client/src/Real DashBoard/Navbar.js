@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, Outlet } from 'react-router-dom';
-import image from "../assets/real logo.jpg"
+import image from "../assets/finallogo.png";
 
 const Navbar = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -17,8 +17,11 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-16">
             {/* Left Side: Logo */}
             <div className="flex-shrink-0">
-              <a href="/" className="text-2xl font-bold">Sera</a>
-              {/* <img src={image} /> */}
+              <img
+                className="h-10 w-auto sm:h-10 lg:h-16 object-contain"
+                src={image}
+                alt="Logo"
+              />
             </div>
 
             {/* Center: Menu Items (shown on larger screens) */}
@@ -26,10 +29,10 @@ const Navbar = () => {
               <a href="/" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
                 Home
               </a>
-              <a href="#services" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
-                Browse Services
+              <a href="/#services" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
+                 Services
               </a>
-              <a href="#freelancers" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
+              <a href="/#freelancers" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
                 Freelancers
               </a>
               <a href="/" className="hover:text-gray-300 hover:underline px-3 py-2 text-base font-medium">
@@ -88,7 +91,7 @@ const Navbar = () => {
           </li>
           <li>
             <a href="/" className="block px-3 py-2 text-gray-700 hover:bg-gray-200 rounded">
-              Browse Jobs
+               Jobs
             </a>
           </li>
           <li>

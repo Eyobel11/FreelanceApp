@@ -1,16 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { FaHome, FaBriefcase, FaClipboardList, FaUsers, FaHeart, FaEnvelope, FaBell, FaUserCircle, FaLeftFromBracket } from 'react-icons/fa';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet,useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../slices/authSlice'; // Import the logout action
 import Swal from 'sweetalert2';
+import image from "../assets/logofinal.png";
+import axios from '../utils/axios';
+
+
+
 
 const DashboardFreelancer = () => {
 
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);  // Fetch user data from Redux
+
+  const { userId: paramUserId } = useParams(); // Get userId from route params
+  const reduxUserId = useSelector((state) => state.auth.user._id); // Get userId from Redux
+  const userId = paramUserId || reduxUserId; // Use paramUserId if it exists, else use reduxUserId
 
 
   const toggleDrawer = () => {
@@ -41,6 +50,28 @@ const DashboardFreelancer = () => {
       }
     });
   };
+
+  const [profile, setProfile] = useState({});
+
+ 
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`/freelancerprofile/${userId}`);
+        console.log('Profile Data:', response.data); // Log profile data
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId]);
+
+  
   
 
 
@@ -58,7 +89,13 @@ const DashboardFreelancer = () => {
           <div className="flex justify-between items-center h-16">
             {/* Left Side: Logo */}
             <div className="flex-shrink-0">
-              <a href="/" className="text-2xl font-bold">Freeio</a>
+              
+            <img
+                className="h-10 w-auto sm:h-10 lg:h-16 object-contain"
+                src={image}
+                alt="Logo"
+              />
+              
             </div>
 
             {/* Center: Menu Items */}
@@ -79,7 +116,7 @@ const DashboardFreelancer = () => {
               {/* <FaBell className="text-gray-500 text-2xl" /> */}
               <div className="flex items-center space-x-3">
                 <img
-                  src={user.image}
+                  src={profile?.profileImage ? `http://localhost:5000${profile.profileImage}` : "https://via.placeholder.com/150"}
                   alt="User Profile"
                   className="w-10 h-10 rounded-full object-cover"
                 />
@@ -168,7 +205,7 @@ const DashboardFreelancer = () => {
           {/* User Profile Display */}
           <div className="flex items-center space-x-3 mb-6">
             <img
-              src={user.image}
+              src={profile.profileImage ? `http://localhost:5000${profile.profileImage}` : "https://via.placeholder.com/150"}
               alt="User Profile"
               className="w-12 h-12 rounded-full object-cover"
             />

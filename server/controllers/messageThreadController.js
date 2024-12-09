@@ -25,7 +25,10 @@ const sendMessage = async (req, res) => {
       freelancersId: new mongoose.Types.ObjectId(freelancersId),
     };
 
-    let thread = await MessageThread.findOne(query);
+    let thread = await MessageThread.findOne(query)
+    .populate('clientId', 'name') // Populate client's name
+    .populate('freelancersId', 'name') // Populate freelancer's name
+    .populate('serviceId', 'title'); // Populate service title;
 
     if (!thread) {
       console.log('No existing thread found. Creating a new one with:', query);
@@ -68,8 +71,8 @@ const getMessageThreads = async (req, res) => {
       $or: [{ clientId: userId }, { freelancersId: userId }],
     })
     .populate('serviceId', 'title') // Populate service info for reference
-    .populate('clientId', 'fullName')
-    .populate('freelancersId', 'fullName');
+    .populate('clientId', 'name')
+    .populate('freelancersId', 'name');
 
     res.status(200).json(threads);
   } catch (error) {
@@ -84,9 +87,9 @@ const getThreadById = async (req, res) => {
 
   try {
     const thread = await MessageThread.findById(threadId)
-      .populate('messages.senderId', 'fullName') // Populate sender details in messages
-      .populate('clientId', 'fullName')
-      .populate('freelancersId', 'fullName')
+      .populate('messages.senderId', 'name') // Populate sender details in messages
+      .populate('clientId', 'name')
+      .populate('freelancersId', 'name')
       .populate('serviceId', 'title');
 
     if (!thread) return res.status(404).json({ error: 'Thread not found' });
@@ -104,7 +107,7 @@ const getFreelancerThreads = async (req, res) => {
 
   try {
     const threads = await MessageThread.find({ freelancersId: freelancerId })
-      .populate('clientId', 'fullName') // Populate client's details
+      .populate('clientId', 'name') // Populate client's details
       .populate('serviceId', 'title')    // Populate service title
       .sort({ updatedAt: -1 });          // Sort by latest messages
 
@@ -120,7 +123,7 @@ const getClientThreads = async (req, res) => {
 
   try {
     const threads = await MessageThread.find({ clientId })
-      .populate('freelancersId', 'fullName') // Populate freelancer's details
+      .populate('freelancersId', 'name') // Populate freelancer's details
       .populate('serviceId', 'title')        // Populate service title
       .sort({ updatedAt: -1 });              // Sort by latest messages
 
@@ -131,6 +134,20 @@ const getClientThreads = async (req, res) => {
   }
 };
 
+const deleteMessageThread = async (req, res) => {
+  const { threadId } = req.params;
+
+  try {
+    const thread = await MessageThread.findByIdAndDelete(threadId);
+    if (!thread) {
+      return res.status(404).json({ error: 'Thread not found' });
+    }
+    res.status(200).json({ message: 'Thread deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting thread:', error);
+    res.status(500).json({ error: 'Error deleting thread' });
+  }
+};
 
 
 
@@ -140,5 +157,6 @@ module.exports = {
     getThreadById,
     getFreelancerThreads, 
     getClientThreads, // Export new function
+    deleteMessageThread,
 
 }

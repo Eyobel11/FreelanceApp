@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../utils/axios';
+import Swal from 'sweetalert2';
 
 const ClientInbox = () => {
   const [threads, setThreads] = useState([]);
@@ -22,6 +23,43 @@ const ClientInbox = () => {
   }, []);
 
   if (loading) return <p className="text-center mt-8 text-gray-500">Loading inbox...</p>;
+
+  const handleDelete = async (threadId) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+      });
+
+      if (!result.isConfirmed) return;
+
+      // Proceed with the deletion if confirmed
+      await axios.delete(`/messaging/thread/${threadId}`);
+      setThreads((prevThreads) => prevThreads.filter((thread) => thread._id !== threadId));
+
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'The thread has been deleted.',
+        icon: 'success',
+        confirmButtonColor: '#3085d6',
+      });
+    } catch (error) {
+      console.error('Error deleting thread:', error);
+
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete the thread. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+      });
+    }
+  };
 
   return (
     <div className="client-inbox min-h-screen bg-gray-100 py-8 flex flex-col items-center">
@@ -46,6 +84,12 @@ const ClientInbox = () => {
               >
                 View Conversation &rarr;
               </Link>
+              <button
+                onClick={() => handleDelete(thread._id)}
+                className="ml-4 px-3 py-1.5 text-red-600 font-semibold hover:text-red-700 bg-gray-100 rounded-md border border-red-200 hover:border-red-400 transition-colors duration-200"
+              >
+                Delete
+              </button>
             </div>
           ))
         ) : (

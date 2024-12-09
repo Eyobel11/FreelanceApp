@@ -4,15 +4,19 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure the 'uploads/profile-pictures' directory exists
+// Ensure the 'uploads/profile-pictures' and 'uploads/resumes' directories exist
 if (!fs.existsSync('uploads/profile-pictures')) {
   fs.mkdirSync('uploads/profile-pictures', { recursive: true });
 }
+if (!fs.existsSync('uploads/resumes')) {
+  fs.mkdirSync('uploads/resumes', { recursive: true });
+}
 
-// Set up multer storage for profile pictures
+// Set up multer storage for profile pictures and resumes
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/profile-pictures');
+    const uploadDir = file.fieldname === 'gallery' ? 'uploads/resumes' : 'uploads/profile-pictures';
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
@@ -59,11 +63,14 @@ const createOrUpdateProfile = async (req, res) => {
         profile.employees = employees || profile.employees;
         profile.responseTime = responseTime || profile.responseTime;
   
-        if (req.file) {
-          // If a new profile image is uploaded, update it
-          profile.profilePicture = `/uploads/profile-pictures/${req.file.filename}`;
-          profile.gallery = `/uploads/profile-pictures/${req.file.filename}`;
-        }
+      // Handle profile picture upload
+      
+      if (req.files['profilePicture']) {
+        profile.profilePicture = `/uploads/profile-pictures/${req.files['profilePicture'][0].filename}`;
+      }
+      if (req.files['gallery']) {
+        profile.gallery = `/uploads/resumes/${req.files['gallery'][0].filename}`;
+      }
   
         // Save updated profile
         await profile.save();
@@ -98,8 +105,8 @@ const createOrUpdateProfile = async (req, res) => {
           foundedDate,
           employees,
           responseTime,
-          profilePicture: req.file ? `/uploads/profile-pictures/${req.file.filename}` : '',
-          gallery: req.file ? `/uploads/profile-pictures/${req.file.filename}` : ''
+          profilePicture: req.files['profilePicture'] ? `/uploads/profile-pictures/${req.files['profilePicture'][0].filename}` : '',
+          gallery: req.files['gallery'] ? `/uploads/resumes/${req.files['resume'][0].filename}` : '',
         });
   
         await newProfile.save();
@@ -157,8 +164,6 @@ const updateProfile = async (req, res) => {
   } = req.body;
 
   try {
-    const profilePicture = req.file ? `/uploads/profile-pictures/${req.file.filename}` : null;
-    const gallery = req.file ? `/uploads/profile-pictures/${req.file.filename}` : null;
 
     const updatedProfile = await ClientProfile.findOneAndUpdate(
       { user: req.user.id },
@@ -176,9 +181,11 @@ const updateProfile = async (req, res) => {
         foundedDate,
         employees,
         responseTime,
-        profilePicture: profilePicture || undefined,
-        gallery: gallery || undefined,
+        profilePicture: req.files['profilePicture'] ? `/uploads/profile-pictures/${req.files['profilePicture'][0].filename}` : undefined,
+        gallery: req.files['gallery'] ? `/uploads/resumes/${req.files['resume'][0].filename}` : undefined,
       },
+     
+      
       { new: true }
     );
 

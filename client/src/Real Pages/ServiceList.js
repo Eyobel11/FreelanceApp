@@ -137,7 +137,8 @@ const ServiceList = () => {
                 className="bg-white p-6 mb-6 rounded-lg shadow-md flex flex-col lg:flex-row items-start"
               >
                 <img
-                  src={service.thumbnail || "https://via.placeholder.com/600x400"}
+                  // src={service.thumbnail || "https://via.placeholder.com/600x400"}
+                  src={service.featuredImage ? `http://localhost:5000${service.featuredImage}` : "https://via.placeholder.com/600x400"}
                   alt={service.title}
                   className="w-full lg:w-1/3 h-40 rounded-lg object-cover mb-4 lg:mb-0 lg:mr-6"
                 />
@@ -159,13 +160,14 @@ const ServiceList = () => {
                   <div className="flex items-center mt-4">
                     <img
                       src={service.profileImage || "https://via.placeholder.com/40"}
+                      // src={service.featuredImage ? `http://localhost:5000${service.featuredImage}`: "https://via.placeholder.com/40"}
                       alt={service.name}
                       className="w-8 h-8 rounded-full object-cover mr-2"
                     />
-                    <p className="text-sm text-gray-500">by {service.name}</p>
+                    <p className="text-sm text-gray-500">by {service.fullName}</p>
                   </div>
-                  <div className="flex items-center justify-end">
-                    <p className="font-bold text-lg -mt-8">${service.servicePrice}</p>
+                  <div className="flex items-center justify-end -mt-8 ">
+                    <p className="font-bold text-lg  ">${service.servicePrice}</p>
                   </div>
                 </div>
                 <button  onClick={() => handleFreelancerClick(service._id)}  className="mt-4 lg:mt-0 lg:ml-6 bg-green-900 hover:bg-green-950 text-white px-4 py-2 rounded-lg">

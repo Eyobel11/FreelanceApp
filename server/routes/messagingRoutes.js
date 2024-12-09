@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { sendMessage, getMessageThreads, getThreadById, getFreelancerThreads,getClientThreads} = require('../controllers/messageThreadController');
+const { sendMessage, getMessageThreads, getThreadById, getFreelancerThreads,getClientThreads, deleteMessageThread} = require('../controllers/messageThreadController');
 const protect = require('../middleware/authMiddleware');
 
 // Route to send a message
@@ -15,6 +15,9 @@ router.get('/thread/:threadId', protect, getThreadById);
 router.get('/freelancer/inbox', protect, getFreelancerThreads);
 
 router.get('/client/inbox', protect, getClientThreads);
+
+router.delete('/thread/:threadId', protect, deleteMessageThread);
+
 
 
 

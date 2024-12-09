@@ -56,21 +56,21 @@ const Contact = () => {
               <FaMapMarkerAlt className="text-2xl md:text-3xl text-green-700" />
               <div>
                 <h4 className="text-lg md:text-xl font-normal">Address</h4>
-                <p className="text-gray-600">1234 Greenberry Street, North Melbourne, VIC 3051, Australia</p>
+                <p className="text-gray-600"> 22 Street, Addis Ababa, Ethiopia</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <FaPhoneAlt className="text-2xl md:text-3xl text-green-700" />
               <div>
                 <h4 className="text-lg md:text-xl font-normal">Phone</h4>
-                <p className="text-gray-600">(080) 123 456 789</p>
+                <p className="text-gray-600">+ (251) 9 2917 7304</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <FaEnvelope className="text-2xl md:text-3xl text-green-700" />
               <div>
                 <h4 className="text-lg md:text-xl font-normal">Email</h4>
-                <p className="text-gray-600">hello@freeio.com</p>
+                <p className="text-gray-600">eyobel1214@gmail.com</p>
               </div>
             </div>
           </div>
@@ -127,8 +127,8 @@ const Contact = () => {
         <section className="mt-10">
           <iframe
             className="w-full h-64 md:h-96 rounded-lg"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.8354345093795!2d144.9560541153165!3d-37.817209979751664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf5778d7b3afda764!2sMelbourne%20CBD!5e0!3m2!1sen!2sau!4v1611783944186!5m2!1sen!2sau"
-            allowFullScreen=""
+            
+            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d9931.24917252092!2d38.78495145631046!3d9.020054373277477!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2set!4v1733345141784!5m2!1sen!2set"            allowFullScreen=""
             loading="lazy"
           ></iframe>
         </section>

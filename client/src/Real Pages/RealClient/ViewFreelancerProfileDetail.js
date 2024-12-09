@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaMapMarkerAlt, FaClock, FaStar, FaEnvelope, FaPhone, FaUserCircle, FaBriefcase, FaCalendarAlt, FaLanguage, FaTransgender } from 'react-icons/fa';
 
-import { useParams, useNavigate } from 'react-router-dom'; // To get userId from URL
+import { useParams, useNavigate, Link } from 'react-router-dom'; // To get userId from URL
 import { useSelector } from 'react-redux'; // To get userId from Redux
 import axios from '../utils/axios';
 
@@ -9,28 +9,41 @@ import axios from '../utils/axios';
 const ViewFreelancerProfileDetail = () => {
 
   const { userId: freelancerId } = useParams(); 
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState({});
   const clientId = useSelector((state) => state.auth.user._id); // Get client ID from Redux state
   const navigate = useNavigate();
+  const [jobs, setJobs] = useState([]);  // Add state for jobs
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(`/freelancerprofile/view/${freelancerId}`);
         setProfile(response.data);
+
+    
+  
+        // Fetch jobs only if `user` exists in the profile data
+        if (response.data.user && response.data.user._id) {
+          const jobsResponse = await axios.get(`/servicepost/freelancer/${response.data.user._id}`);
+          setJobs(jobsResponse.data);
+        }
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
     };
-
+  
     if (freelancerId) {
       fetchProfile();
     }
   }, [freelancerId]);
-
-  if (!profile) {
+  
+  if (!profile || !profile.user) {
     return <p>Loading profile...</p>;
   }
+  
+  console.log('Profile Data:', profile);
+  console.log('Freelancer ID:', profile.user?._id);
+  
   // Handle contact initiation with serviceId and initial message content
   const handleContactMe = async () => {
     try {
@@ -57,7 +70,8 @@ const ViewFreelancerProfileDetail = () => {
       <div className="image-add bg-cover bg-center text-black py-6 px-6 lg:flex lg:items-center lg:justify-between">
         <div className="lg:flex lg:items-center">
           <img
-            src="https://via.placeholder.com/150"
+            
+            src={profile.profileImage? `http://localhost:5000${profile.profileImage}`: "https://via.placeholder.com/150"}
             alt="Freelancer"
             className="w-32 h-32 lg:w-48 lg:h-48 rounded-full object-cover mr-6"
           />
@@ -67,14 +81,14 @@ const ViewFreelancerProfileDetail = () => {
             <div className="flex items-center space-x-6 mt-4">
               <span className="flex items-center">
                 <FaCalendarAlt className="mr-2 text-gray-600" />
-                DOB: {profile.dob}
+                DOB:{new Date(profile.dob).toLocaleDateString()}
               </span>
               <span className="flex items-center">
                 <FaMapMarkerAlt className="mr-2 text-gray-600" />
                 Location: {profile.location}
               </span>
               <span className=" px-3 py-1 rounded-full text-sm">
-                ⭐ 4.9 (52 Reviews)
+                ⭐ 0 (0 Reviews)
               </span>
             </div>
           </div>
@@ -97,64 +111,92 @@ const ViewFreelancerProfileDetail = () => {
           {/* About Me Section */}
           <div className=" p-6">
             <h3 className="text-2xl font-bold mb-4">About Me</h3>
-            <p>{profile.description}</p>
+            
+            <div
+                className=""
+                dangerouslySetInnerHTML={{ __html: profile.description }}
+              ></div>
           </div>
 
-          {/* Education Section */}
+          {/* // Education Section */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-xl font-bold mb-4">Education</h3>
-            <ul className="list-disc ml-5">
-              <li>{profile.educations}</li>
-              <li>Bachelor of Nursing - XYZ University, 2012</li>
-              <li>Master of Healthcare Management - ABC University, 2015</li>
-            </ul>
+            {profile.educations && profile.educations.length > 0 ? (
+              <ul className="list-disc ml-5">
+                {profile.educations.filter(Boolean).map((education, index) => (
+                  <li key={index}>{education}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No education details available.</p>
+            )}
           </div>
 
-          {/* Work Experience Section */}
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <h3 className="text-2xl font-bold mb-4">Work Experience</h3>
-            <ul className="list-disc ml-5">
-              <li>{profile.works}</li>
-              <li>Senior Nursing Assistant at XYZ Hospital, 2015-Present</li>
-              <li>Healthcare Consultant, Freelance, 2018-Present</li>
-            </ul>
+               {/* // Work Experience Section */}
+           <div className="bg-white shadow-md rounded-lg p-6">
+            <h3 className="text-xl font-bold mb-4">Work Experience</h3>
+            {profile.works && profile.works.length > 0 ? (
+              <ul className="list-disc ml-5">
+                {profile.works.filter(Boolean).map((work, index) => (
+                  <li key={index}>{work}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No work experience available.</p>
+            )}
           </div>
 
-          {/* Awards Section */}
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <h3 className="text-2xl font-bold mb-4">Awards</h3>
-            <ul className="list-disc ml-5">
-            <li>{profile.awards}</li>
-              <li>Best Healthcare Assistant Award, 2019</li>
-              <li>Outstanding Nursing Services Award, 2020</li>
-            </ul>
-          </div>
+               {/* // Awards Section */}
+               <div className="bg-white shadow-md rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Awards</h3>
+              {profile.awards && profile.awards.length > 0 ? (
+                <ul className="list-disc ml-5">
+                  {profile.awards.filter(Boolean).map((award, index) => (
+                    <li key={index}>{award}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No awards listed.</p>
+              )}
+            </div>
 
           {/* Posted Services Section */}
-          <div className=" p-6">
+          <div className="p-6">
             <h3 className="text-2xl font-bold mb-4">Posted Services</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-                <img 
-                  src="https://freeio.blogdu.de/wp-content/uploads/2022/11/service11-768x576.jpg"
-                  alt="Service Image"
-                  className="w-full h-40 object-cover rounded-md mb-4"
-                />
-                <div className="text-gray-500 text-sm">Design & Creative</div>
-                <h3 className="text-lg font-semibold text-gray-900">Developers drop the framework folder into a...</h3>
-                <div className="flex items-center mt-2 mb-4">
-                  <FaStar className="text-yellow-400" />
-                  <span className="ml-1 text-gray-700 font-bold">4.5</span>
-                  <span className="ml-2 text-gray-500">(2 Reviews)</span>
+
+
+            {jobs.map(job => (
+
+                  <Link to={`/client/servicedetail/${job._id}`}  >
+                <div key={job._id} className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                  <img 
+                    // src={job.featuredImage || 'https://via.placeholder.com/150'}  // Placeholder if no image
+                    src={job.featuredImage? `http://localhost:5000${job.featuredImage}` : "https://via.placeholder.com/150"}
+                    alt="Service Image"
+                    className="w-full h-40 object-cover rounded-md mb-4"
+                  />
+                  <div className="text-gray-500 text-sm">{job.category}</div>
+                  <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                  <div className="flex items-center mt-2 mb-4">
+                    <FaStar className="text-yellow-400" />
+                    <span className="ml-1 text-gray-700 font-bold">{job.rating || 'N/A'}</span>
+                    <span className="ml-2 text-gray-500">({job.reviewCount || 0} Reviews)</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">{profile.fullName}</div>
+                    <div className="text-gray-900 font-bold">Starting at: ${job.servicePrice}</div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-500">John Paul</div>
-                  <div className="text-gray-900 font-bold">Starting at: $128.00</div>
-                </div>
-              </div>
+
+                </Link>
+              ))}
+
+
               {/* Add more services here if needed */}
             </div>
           </div>
+
 
          {/* Reviews Section */}
         <div className="mt-6 p-4 sm:w-full md:w-full lg:w-full">
@@ -164,14 +206,14 @@ const ViewFreelancerProfileDetail = () => {
             <div className="bg-orange-100 p-4 rounded-lg">
               <p className="font-semibold">Admin</p>
               <p className="text-yellow-500">⭐⭐⭐⭐☆</p>
-              <p className="text-gray-600">Lorem ipsum dolor sit amet, consectetur.</p>
+              <p className="text-gray-600">Great Job.</p>
             </div>
 
             {/* Review 2 */}
             <div className="bg-orange-100 p-4 rounded-lg">
-              <p className="font-semibold">Ali Tufan</p>
+              <p className="font-semibold">Eyobel</p>
               <p className="text-yellow-500">⭐⭐⭐⭐⭐</p>
-              <p className="text-gray-600 ">Vivamus vehicula sodales est, eu rhoncus urna semper eu.</p>
+              <p className="text-gray-600 ">Keep up the good work.</p>
             </div>
           </div>
 
@@ -275,18 +317,21 @@ const ViewFreelancerProfileDetail = () => {
             </ul>
           </div>
 
-          {/* Skills Section */}
-          
+          {/* // Skills Section */}
           <div className="bg-white shadow-md rounded-lg p-6">
-                   <h3 className="text-xl font-bold mb-4">Skills</h3>
-                   <div className="flex flex-wrap">
-                     {profile.skills ? profile.skills.map((skill, index) => (
-                       <span key={index} className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
-                         {skill}
-                       </span>
-                     )) : <p>No skills listed</p>}
-                   </div>
-                 </div>
+              <h3 className="text-xl font-bold mb-4">Skills</h3>
+              <div className="flex flex-wrap">
+                {profile.skills && profile.skills.length > 0 ? (
+                  profile.skills.filter(Boolean).map((skill, index) => (
+                    <span key={index} className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <p>No skills listed.</p>
+                )}
+              </div>
+            </div>
                     
         </div>
 

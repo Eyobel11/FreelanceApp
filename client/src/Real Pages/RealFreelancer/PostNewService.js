@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from '../utils/axios'; // Import Axios for API call
 import Swal from 'sweetalert2';
+import {useNavigate} from 'react-router-dom'
 
 function PostNewService() {
+
+  const navigate = useNavigate()
+
   const [profileImage, setProfileImage] = useState(null);
   const [fullName, setFullName] = useState('');
   const [location, setLocation] = useState('');
@@ -71,6 +75,8 @@ function PostNewService() {
         confirmButtonColor: '#3E4B40',
       });
       console.log('Service posted successfully:', response.data);
+      
+      navigate(`/freelancer/myservice`)
       // Optionally reset the form or display a success message
     } catch (error) {
 

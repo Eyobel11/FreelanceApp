@@ -54,6 +54,10 @@ const createOrUpdateFreelancerProfile = async (req, res) => {
     // Find profile by user ID (assuming user is logged in and req.user.id is available)
     let profile = await FreelancerProfile.findOne({ user: req.user.id });
 
+
+    const sanitizeList = (list) =>
+      list ? list.split(',').map((item) => item.trim()).filter(Boolean) : [];
+    
     if (profile) {
       // Update profile fields
       profile.fullName = fullName || profile.fullName;
@@ -70,11 +74,11 @@ const createOrUpdateFreelancerProfile = async (req, res) => {
       profile.category = category || profile.category;
       profile.friendlyAddress = friendlyAddress || profile.friendlyAddress;
       profile.videoUrl = videoUrl || profile.videoUrl;
-      profile.skills = skills ? skills.split(',') : profile.skills;
-      profile.awards = awards ? awards.split(',') : profile.awards;
-      profile.works = works ? works.split(',') : profile.works;
-      profile.educations = educations ? educations.split(',') : profile.educations;
-      profile.faqs = faqs ? faqs.split(',') : profile.faqs;
+      profile.skills = sanitizeList(skills) || profile.skills;
+      profile.awards = sanitizeList(awards) || profile.awards;
+      profile.works = sanitizeList(works) || profile.works;
+      profile.educations = sanitizeList(educations) || profile.educations;
+      profile.faqs = sanitizeList(faqs) || profile.faqs;
 
       // If new files are uploaded, update the file paths
       if (req.files['profileImage']) {
@@ -117,11 +121,11 @@ const createOrUpdateFreelancerProfile = async (req, res) => {
         category,
         friendlyAddress,
         videoUrl,
-        skills: skills ? skills.split(',') : [],
-        awards: awards ? awards.split(',') : [],
-        works: works ? works.split(',') : [],
-        educations: educations ? educations.split(',') : [],
-        faqs: faqs ? faqs.split(',') : [],
+        skills: sanitizeList(skills),
+        awards: sanitizeList(awards),
+        works: sanitizeList(works),
+        educations: sanitizeList(educations),
+        faqs: sanitizeList(faqs),
         profileImage: req.files['profileImage'] ? `/uploads/profile-pictures/${req.files['profileImage'][0].filename}` : '',
         resume: req.files['resume'] ? `/uploads/resumes/${req.files['resume'][0].filename}` : '',
       });
@@ -209,6 +213,8 @@ const updateFreelancerProfile = async (req, res) => {
   } = req.body;
 
   try {
+    const sanitizeList = (list) =>
+      list ? list.split(',').map((item) => item.trim()).filter(Boolean) : [];
     const updatedProfile = await FreelancerProfile.findOneAndUpdate(
       { user: req.user.id },
       {
@@ -226,11 +232,11 @@ const updateFreelancerProfile = async (req, res) => {
         category,
         friendlyAddress,
         videoUrl,
-        skills: skills ? skills.split(',') : [],
-        awards: awards ? awards.split(',') : [],
-        works: works ? works.split(',') : [],
-        educations: educations ? educations.split(',') : [],
-        faqs: faqs ? faqs.split(',') : [],
+        skills: sanitizeList(skills),
+        awards: sanitizeList(awards),
+        works: sanitizeList(works),
+        educations: sanitizeList(educations),
+        faqs: sanitizeList(faqs),
         profileImage: req.files['profileImage'] ? `/uploads/profile-pictures/${req.files['profileImage'][0].filename}` : undefined,
         resume: req.files['resume'] ? `/uploads/resumes/${req.files['resume'][0].filename}` : undefined,
       },

@@ -125,9 +125,11 @@ const JobDetailDashClient = () => {
           {/* Job Description */}
           <div className="mb-6">
             <h2 className="text-xl font-bold mb-4">Job Description</h2>
-            <p className="text-gray-600">
-              {job.description || "No description available."}
-            </p>
+              <div
+                className="text-gray-600"
+                dangerouslySetInnerHTML={{ __html: job.description }}
+              ></div>
+            
           </div>
         </div>
       </div>

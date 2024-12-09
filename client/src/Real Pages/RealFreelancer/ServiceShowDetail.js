@@ -1,25 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { FaMapMarkerAlt, FaClock, FaGlobe, FaStar, FaUserCircle, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import axios from '../utils/axios'; // Make sure axios is properly configured
-import { useParams } from 'react-router-dom'; // Import useParams from react-router-dom
+import { Link, useParams } from 'react-router-dom'; // To get userId from URL
+import { useSelector } from 'react-redux'; // To get userId from Redux
 
 const ServiceShowDetail = () => {
   const { serviceId } = useParams(); // Get jobId from the route params
   const [service, setService] = useState(null); // State for a single job
   const [current, setCurrent] = useState(0);
-  const images = [
-    "https://via.placeholder.com/600x400", 
-    "https://via.placeholder.com/600x400", 
-    "https://via.placeholder.com/600x400"
-  ];
+
+  const { userId: paramUserId } = useParams(); // Get userId from route params
+  const reduxUserId = useSelector((state) => state.auth.user._id); // Get userId from Redux
+  const userId = paramUserId || reduxUserId; // Use paramUserId if it exists, else use reduxUserId
+  const [profile, setProfile] = useState({});
+  // const images = [
+  //   "https://via.placeholder.com/600x400", 
+  //   "https://via.placeholder.com/600x400", 
+  //   "https://via.placeholder.com/600x400"
+  // ];
+  const images = service 
+  ? [service.featuredImage, ...service.gallery]
+  : ["https://via.placeholder.com/600x400"];
+  
+
 
   useEffect(() => {
     const fetchJob = async () => {
       if (!serviceId) return;
 
       try {
+       
         const response = await axios.get(`/servicepost/${serviceId}`); // Fetch the job details using jobId
         setService(response.data);
+
+         // Fetch jobs only if `user` exists in the profile data
+         if (response.data.user && response.data.user._id) {
+          const profileResponse = await axios.get(`/freelancerprofile/${response.data.user._id}`);
+          setProfile(profileResponse.data);
+         }
+
+        
       } catch (error) {
         console.error('Error fetching job:', error);
       }
@@ -69,7 +89,7 @@ const ServiceShowDetail = () => {
           {images.length > 0 ? (
             <>
               <img
-                src={images[current]}
+                src={`http://localhost:5000${images[current]}`}
                 alt="Gig Work"
                 className="w-full h-auto object-cover rounded-lg"
               />
@@ -83,7 +103,7 @@ const ServiceShowDetail = () => {
                 {images.map((img, idx) => (
                   <img
                     key={idx}
-                    src={img}
+                    src={`http://localhost:5000${img}`}
                     alt={`Thumbnail ${idx}`}
                     className={`w-20 h-16 object-cover cursor-pointer rounded-lg ${current === idx ? 'border-2 border-green-500' : 'border'}`}
                     onClick={() => setCurrent(idx)}
@@ -102,12 +122,14 @@ const ServiceShowDetail = () => {
             <div className="ml-4">
               <h3 className="text-lg font-bold">{service.fullName}</h3>
               <p className="text-sm text-gray-500">{service.responseTime}</p>
-              <p className="text-gray-600 mt-1">4.8 <FaStar className="inline text-yellow-500" /> (32 Reviews)</p>
+              <p className="text-gray-600 mt-1">0 <FaStar className="inline text-yellow-500" /> (0 Reviews)</p>
             </div>
           </div>
-          <p className="text-gray-700 mb-4">
-              {service.description}
-          </p>
+         
+          <div
+            className="text-gray-700 mb-4"
+            dangerouslySetInnerHTML={{ __html: profile.description }}
+            ></div>
           <button className="bg-green-500 text-white py-2 px-4 rounded-lg w-full">Contact Me</button>
         </div>
       </div>
@@ -115,9 +137,12 @@ const ServiceShowDetail = () => {
       {/* Service Description Section */}
       <div className="mt-6 p-4">
         <h3 className="text-xl font-bold">Service Description</h3>
-        <p className="text-gray-700 mt-2">
-         {service.description}
-          </p>
+        
+          <div
+            className="text-gray-700 mt-2"
+            dangerouslySetInnerHTML={{ __html: service.description }}
+            ></div>
+
       </div>
 
       {/* Reviews Section */}
@@ -128,14 +153,14 @@ const ServiceShowDetail = () => {
     <div className="bg-gray-100 p-4 rounded-lg w-1/2">
       <p className="font-semibold">Admin</p>
       <p className="text-yellow-500">⭐⭐⭐⭐☆</p>
-      <p className="text-gray-600">Lorem ipsum dolor sit amet, consectetur.</p>
+      <p className="text-gray-600">keep up the good work.</p>
     </div>
 
     {/* Review 2 */}
     <div className="bg-gray-100 p-4 rounded-lg w-1/2">
-      <p className="font-semibold">Ali Tufan</p>
+      <p className="font-semibold">Eyobel</p>
       <p className="text-yellow-500">⭐⭐⭐⭐⭐</p>
-      <p className="text-gray-600 ">Vivamus vehicula sodales est, eu rhoncus urna semper eu.</p>
+      <p className="text-gray-600 ">Keep up the work.</p>
     </div>
   </div>
 

@@ -13,6 +13,9 @@ const Message = require('./models/Message'); // Import the Message model
 dotenv.config();
 const app = express();
 
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads/profile-pictures');
 const uploadDirs = path.join(__dirname, 'uploads/attachments');

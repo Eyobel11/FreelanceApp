@@ -52,13 +52,14 @@ const ViewClientProfile = () => {
       <div className="image-add bg-center bg-cover text-black py-10 px-6 lg:flex lg:items-center lg:justify-between">
         <div className="lg:flex lg:items-center">
           <img
-            src="https://via.placeholder.com/150"
+            // src="https://via.placeholder.com/150"
+            src={profile.profilePicture ? `http://localhost:5000${profile.profilePicture}`: "https://via.placeholder.com/150" }
             alt="Freelancer"
             className="w-32 h-32 lg:w-48 lg:h-48 rounded-full object-cover mr-6"
           />
           <div>
             <h1 className="text-3xl font-bold">{profile.fullName}</h1>
-            <p className="text-lg mt-2">Nursing Assistant</p>
+            {/* <p className="text-lg mt-2">Nursing Assistant</p> */}
             <div className="flex items-center space-x-6 mt-4">
               <span className="flex items-center">
                 <FaEnvelope className="mr-2 text-gray-600" />
@@ -69,7 +70,7 @@ const ViewClientProfile = () => {
                 Location: {profile.location}
               </span>
               <span className=" px-3 py-1 rounded-full text-sm">
-                ⭐ 4.9 (52 Reviews)
+                ⭐ 0 (0 Reviews)
               </span>
             </div>
           </div>
@@ -85,8 +86,11 @@ const ViewClientProfile = () => {
           {/* About Me Section */}
           <div className=" p-6">
             <h3 className="text-2xl font-bold mb-4">About Company</h3>
-            <p>
-              {profile.description}</p>
+            
+              <div
+                className=""
+                dangerouslySetInnerHTML={{ __html: profile.description }}
+              ></div>
           </div>
 
           
@@ -100,7 +104,9 @@ const ViewClientProfile = () => {
                     <Link to={`/client/job/${job._id}`} >
                 <div key={job._id} className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
                   <img 
-                    src={job.featuredImage || 'https://via.placeholder.com/150'}  // Placeholder if no image
+                    // src={`localhost:/5000${job.featuredImage}` || 'https://via.placeholder.com/150'}  // Placeholder if no image
+                    src={job.featuredImage ? `http://localhost:5000${job.featuredImage}` : "https://via.placeholder.com/150"}
+
                     alt="Service Image"
                     className="w-full h-40 object-cover rounded-md mb-4"
                   />
@@ -133,14 +139,14 @@ const ViewClientProfile = () => {
             <div className="bg-orange-100 p-4 rounded-lg">
               <p className="font-semibold">Admin</p>
               <p className="text-yellow-500">⭐⭐⭐⭐☆</p>
-              <p className="text-gray-600">Lorem ipsum dolor sit amet, consectetur.</p>
+              <p className="text-gray-600">Keep up the good work</p>
             </div>
 
             {/* Review 2 */}
             <div className="bg-orange-100 p-4 rounded-lg">
-              <p className="font-semibold">Ali Tufan</p>
+              <p className="font-semibold">Eyobel</p>
               <p className="text-yellow-500">⭐⭐⭐⭐⭐</p>
-              <p className="text-gray-600 ">Vivamus vehicula sodales est, eu rhoncus urna semper eu.</p>
+              <p className="text-gray-600 ">Great job.</p>
             </div>
           </div>
 
@@ -192,16 +198,16 @@ const ViewClientProfile = () => {
               </div>
 
               {/* Submit Button */}
-              {/* <button 
+               <button 
                 type="submit" 
                 className="bg-green-900 text-white py-2 px-6 rounded-lg hover:bg-green-950 transition duration-200"
               >
                 Submit Review
-              </button> */}
+              </button> 
 
-              <Link to=  "/client/editprofile " className="bg-green-900 text-white py-2 px-6 rounded-lg hover:bg-green-950 transition duration-200">
+              {/* <Link to=  "/client/editprofile " className="bg-green-900 text-white py-2 px-6 rounded-lg hover:bg-green-950 transition duration-200">
                 Edit Profile
-              </Link>
+              </Link> */}
             </form>
           </div>
         </div>

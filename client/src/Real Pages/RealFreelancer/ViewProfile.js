@@ -15,6 +15,7 @@ const ViewProfilePageReal = () => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(`/freelancerprofile/${userId}`);
+        console.log('Profile Data:', response.data); // Log profile data
         setProfile(response.data);
         const jobsResponse = await axios.get(`/servicepost/freelancer/${userId}`);  // Fetch client jobs
         setJobs(jobsResponse.data);
@@ -39,7 +40,7 @@ const ViewProfilePageReal = () => {
       <div className="image-add bg-center bg-cover text-black py-10 px-6 lg:flex lg:items-center lg:justify-between">
         <div className="lg:flex lg:items-center">
           <img
-            src={profile.profileImage || "https://via.placeholder.com/150"}
+            src={profile.profileImage ? `http://localhost:5000${profile.profileImage}` : "https://via.placeholder.com/150"}
             alt="Freelancer"
             className="w-32 h-32 lg:w-48 lg:h-48 rounded-full object-cover mr-6"
           />
@@ -56,7 +57,7 @@ const ViewProfilePageReal = () => {
                 Location: {profile.location}
               </span>
               <span className="px-3 py-1 rounded-full text-sm">
-                ⭐ 4.9 (52 Reviews)
+                ⭐ 0 (0 Reviews)
               </span>
             </div>
           </div>
@@ -76,37 +77,80 @@ const ViewProfilePageReal = () => {
         {/* Left Column: Freelancer Information */}
         <div className="lg:w-2/3 space-y-8">
           
-          {/* About Me Section */}
-          <div className="p-6">
-            <h3 className="text-2xl font-bold mb-4">About Me</h3>
-            <p>{profile.description}</p>
-          </div>
+          
 
-          {/* Education Section */}
+          {/* About Me Section */}
+
+            <div className="p-6">
+              <h3 className="text-2xl font-bold mb-4">About Me</h3>
+              <div
+                className="text-gray-700"
+                dangerouslySetInnerHTML={{ __html: profile.description }}
+              ></div>
+            </div>
+
+
+          {/* Education Section
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-xl font-bold mb-4">Education</h3>
             <ul className="list-disc ml-5">
               <li>{profile.educations}</li>
               <li>Master of Healthcare Management - ABC University, 2015</li>
             </ul>
-          </div>
+          </div> */}
 
-          {/* Work Experience Section */}
+          {/* // Education Section */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h3 className="text-2xl font-bold mb-4">Work Experience</h3>
-            <ul className="list-disc ml-5">
-              <li>{profile.works}</li>
-              <li>Healthcare Consultant, Freelance, 2018-Present</li>
-            </ul>
+            <h3 className="text-xl font-bold mb-4">Education</h3>
+            {profile.educations && profile.educations.length > 0 ? (
+              <ul className="list-disc ml-5">
+                {profile.educations.filter(Boolean).map((education, index) => (
+                  <li key={index}>{education}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No education details available.</p>
+            )}
           </div>
 
-          {/* Awards Section */}
+        
+
+             {/* // Work Experience Section */}
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h3 className="text-xl font-bold mb-4">Work Experience</h3>
+            {profile.works && profile.works.length > 0 ? (
+              <ul className="list-disc ml-5">
+                {profile.works.filter(Boolean).map((work, index) => (
+                  <li key={index}>{work}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No work experience available.</p>
+            )}
+          </div>
+          
+          {/* Awards Section
             <div className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-2xl font-bold mb-4">Awards</h3>
               <ul className="list-disc ml-5">
                 <li>{profile.awards[0]}</li>
                 <li>Outstanding Nursing Services Award, 2020</li>
               </ul>
+            </div> */}
+
+
+               {/* // Awards Section */}
+            <div className="bg-white shadow-md rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Awards</h3>
+              {profile.awards && profile.awards.length > 0 ? (
+                <ul className="list-disc ml-5">
+                  {profile.awards.filter(Boolean).map((award, index) => (
+                    <li key={index}>{award}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No awards listed.</p>
+              )}
             </div>
 
           {/* Posted Services Section */}
@@ -120,7 +164,8 @@ const ViewProfilePageReal = () => {
                   <Link to={`/freelancer/service/${job._id}`}  >
                 <div key={job._id} className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
                   <img 
-                    src={job.featuredImage || 'https://via.placeholder.com/150'}  // Placeholder if no image
+                    // src={job.featuredImage || 'https://via.placeholder.com/150'}  // Placeholder if no image
+                    src={job.featuredImage? `http://localhost:5000${job.featuredImage}` : "https://via.placeholder.com/150"}
                     alt="Service Image"
                     className="w-full h-40 object-cover rounded-md mb-4"
                   />
@@ -184,7 +229,7 @@ const ViewProfilePageReal = () => {
             </ul>
           </div>
 
-          {/* Skills Section */}
+          {/* Skills Section
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-xl font-bold mb-4">Skills</h3>
             <div className="flex flex-wrap">
@@ -194,7 +239,23 @@ const ViewProfilePageReal = () => {
                 </span>
               )) : <p>No skills listed</p>}
             </div>
-          </div>
+          </div> */}
+
+          {/* // Skills Section */}
+            <div className="bg-white shadow-md rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Skills</h3>
+              <div className="flex flex-wrap">
+                {profile.skills && profile.skills.length > 0 ? (
+                  profile.skills.filter(Boolean).map((skill, index) => (
+                    <span key={index} className="bg-gray-200 text-sm text-gray-600 px-4 py-2 mr-4 mb-4 rounded-lg">
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <p>No skills listed.</p>
+                )}
+              </div>
+            </div>
 
         </div>
 

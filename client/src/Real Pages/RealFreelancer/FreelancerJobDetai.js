@@ -131,9 +131,10 @@ const FreelancerJobDetailDash = () => {
           {/* Job Description */}
           <div className="mb-6">
             <h2 className="text-xl font-medium mb-4">Job Description</h2>
-            <p className="text-gray-600">
-            {profile.description}
-            </p>
+            <div
+                className="text-gray-700"
+                dangerouslySetInnerHTML={{ __html: profile.description }}
+              ></div>
           </div>
         </div>
       </div>

@@ -66,7 +66,7 @@ const ClientProfile = () => {
 
   const handleSaveProfile = async () => {
     const formData = new FormData();
-    formData.append('profilePicture', profilePicture); // 'profilePicture' matches the backend schema
+    // formData.append('profilePicture', profilePicture); // 'profilePicture' matches the backend schema
     formData.append('fullName', fullName);
     formData.append('email', email);
     formData.append('phone', phone);
@@ -74,13 +74,24 @@ const ClientProfile = () => {
     formData.append('description', description);
     formData.append('category', category);
     formData.append('friendlyAddress', friendlyAddress);
-    formData.append('gallery', gallery);
+    // formData.append('gallery', gallery);
     formData.append('videoUrl', videoUrl);
     formData.append('profileShow', profileShow);
     formData.append('website', website);
     formData.append('foundedDate', foundedDate);
     formData.append('employees', employees);
     formData.append('responseTime', responseTime);
+
+    if (profilePicture) {
+      formData.append('profilePicture', profilePicture);
+    }
+    // if (gallery) {
+    //   formData.append('gallery', gallery);
+    // }
+    if (gallery) {
+      formData.append('gallery', gallery);
+    }
+
 
     try {
       const response = await axios.post('/clientprofile', formData, {

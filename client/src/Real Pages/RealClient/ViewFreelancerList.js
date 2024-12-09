@@ -42,7 +42,7 @@ const ViewFreelancerCarousel = () => {
         </div>
 
         <Swiper
-          spaceBetween={20} // Adjust the gap between sliders
+          spaceBetween={0} // Adjust the gap between sliders
           slidesPerView={1} // Start with 1 slide
           autoplay={{ delay: 3000, disableOnInteraction: false }}
           loop={true}
@@ -66,14 +66,15 @@ const ViewFreelancerCarousel = () => {
         >
           {freelancers.map((freelancer) => (
             <SwiperSlide key={freelancer._id}       onClick={() => handleFreelancerClick(freelancer._id)} >
-              <div className="bg-white border border-gray-200 rounded-lg shadow-lg py-4 w-60 mx-auto text-center 
+              <div className="bg-white border border-gray-200 rounded-lg shadow-lg py-0 w-60 h-80 mx-auto text-center 
                 transform hover:scale-105 transition-transform duration-300 ease-in-out animate-fade-in"
           >
                   
                 <img
-                  src={sampleImage}
+                  
+                  src={freelancer.profileImage ? `http://localhost:5000${freelancer.profileImage}` : "https://via.placeholder.com/150x150"}
                   alt="img"
-                  className="w-full h-40 object-cover rounded-t-lg mb-4"
+                  className="w-full h-56 object-cover rounded-t-lg mb-2"
                 />
                 <h3 className="text-lg font-semibold text-gray-900">{freelancer.fullName}</h3>
                 <p className="text-gray-600">{freelancer.jobTitle}</p>

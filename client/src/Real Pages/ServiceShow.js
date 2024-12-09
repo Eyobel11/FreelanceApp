@@ -9,12 +9,14 @@ import axios from '../utils/axios';
 const ServiceShow = () => {
 
   
-  const images = [
-    "https://via.placeholder.com/600x400", 
-    "https://via.placeholder.com/600x400", 
-    "https://via.placeholder.com/600x400"
-  ];
+  // const images = [
+  //   "https://via.placeholder.com/600x400", 
+  //   "https://via.placeholder.com/600x400", 
+  //   "https://via.placeholder.com/600x400"
+  // ];
+  
   const [current, setCurrent] = useState(0);
+  const[jobs,setJobs] = useState({})
 
   const nextImage = () => {
     setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));
@@ -27,11 +29,21 @@ const ServiceShow = () => {
   const { userId: serviceId } = useParams(); 
   const [profile, setProfile] = useState(null);
 
+  const images = profile 
+  ? [profile.featuredImage, ...profile.gallery]
+  : ["https://via.placeholder.com/600x400"];
+  
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(`/servicepost/view/${serviceId}`);
         setProfile(response.data);
+        if (response.data.user && response.data.user._id) {
+          const jobsResponse = await axios.get(`/freelancerprofile/${response.data.user._id}`);
+          setJobs(jobsResponse.data);
+         
+        }
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -72,7 +84,9 @@ const ServiceShow = () => {
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Image Carousel */}
           <div className="lg:col-span-2 relative">
-            <img src={images[current]} alt="Gig Work" className="w-full h-auto object-cover rounded-lg" />
+            <img 
+                 src={`http://localhost:5000${images[current]}`}
+                 alt="Gig Work" className="w-full h-auto object-cover rounded-lg" />
             <button onClick={prevImage} className="absolute top-1/2 left-0 bg-gray-200 p-2 transform -translate-y-1/2">
               <FaChevronLeft />
             </button>
@@ -83,7 +97,7 @@ const ServiceShow = () => {
               {images.map((img, idx) => (
                 <img
                   key={idx}
-                  src={img}
+                  src={`http://localhost:5000${img}`}
                   alt={`Thumbnail ${idx}`}
                   className={`w-20 h-16 object-cover cursor-pointer rounded-lg ${current === idx ? 'border-2 border-green-500' : 'border'}`}
                   onClick={() => setCurrent(idx)}
@@ -99,12 +113,14 @@ const ServiceShow = () => {
               <div className="ml-4">
                 <h3 className="text-lg font-bold">{profile.fullName}</h3>
                 <p className="text-sm text-gray-500">Freelancer</p>
-                <p className="text-gray-600 mt-1">4.8 <FaStar className="inline text-yellow-500" /> (32 Reviews)</p>
+                <p className="text-gray-600 mt-1">0 <FaStar className="inline text-yellow-500" /> (0 Reviews)</p>
               </div>
             </div>
-            <p className="text-gray-700 mb-4">
-              I am a UI/UX designer with over 5 years of experience in creating designs that meet client needs. Contact me for customized services.
-            </p>
+            
+            <div
+                className="text-gray-700 mb-4"
+                dangerouslySetInnerHTML={{ __html: jobs.description }}
+              ></div>
             <button className="bg-green-900 text-white py-2 px-4 rounded-lg w-full  hover:bg-green-950">Contact Me</button>
           </div>
         </div>
@@ -112,9 +128,11 @@ const ServiceShow = () => {
         {/* Service Description Section */}
         <div className="mt-6 p-4">
           <h3 className="text-xl font-bold">Service Description</h3>
-          <p className="text-gray-700 mt-2">
-          {profile.description}
-          </p>
+          
+          <div
+             className="text-gray-700 mt-2"
+             dangerouslySetInnerHTML={{ __html: profile.description }}
+          ></div>
         </div>
 
         {/* Reviews Section */}
@@ -125,14 +143,14 @@ const ServiceShow = () => {
             <div className="bg-orange-100 p-4 rounded-lg">
               <p className="font-semibold">Admin</p>
               <p className="text-yellow-500">⭐⭐⭐⭐☆</p>
-              <p className="text-gray-600">Lorem ipsum dolor sit amet, consectetur.</p>
+              <p className="text-gray-600">Great work loved the service.</p>
             </div>
 
             {/* Review 2 */}
             <div className="bg-orange-100 p-4 rounded-lg">
-              <p className="font-semibold">Ali Tufan</p>
+              <p className="font-semibold">Eyobel</p>
               <p className="text-yellow-500">⭐⭐⭐⭐⭐</p>
-              <p className="text-gray-600 ">Vivamus vehicula sodales est, eu rhoncus urna semper eu.</p>
+              <p className="text-gray-600 ">Keep up the good work.</p>
             </div>
           </div>
 

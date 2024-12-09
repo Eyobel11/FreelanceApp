@@ -64,7 +64,9 @@ const TrendingServicesSection = () => {
                 onClick={() => handleFreelancerClick(service._id)}
               >
                 <img
-                  src={service.img || 'https://via.placeholder.com/150'}
+                  // src={service.img || 'https://via.placeholder.com/150'}
+                  src={service.featuredImage? `http://localhost:5000${service.featuredImage}` : "https://via.placeholder.com/150"}
+
                   alt={service.title}
                   className="w-full h-40 object-cover rounded-md mb-4"
                 />
