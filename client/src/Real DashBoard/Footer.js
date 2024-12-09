@@ -86,7 +86,7 @@ const Footer = () => {
       {/* Bottom Row */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8 border-t border-orange-200 pt-4 animate-fade-in">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-center md:text-left">&copy; Freeio. 2022 CreativeLayers. All rights reserved.</p>
+          <p className="text-sm text-center md:text-left">&copy; Eyobel Fitsum. 2024 CreativeLayers. All rights reserved.</p>
           <div className="relative inline-block text-left mt-4 md:mt-0">
             {/* <button className="text-sm flex items-center bg-gray-800 px-2 py-1 rounded hover:bg-gray-700">
               English <span className="ml-2">▼</span>
