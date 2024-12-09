@@ -38,7 +38,7 @@ if (!fs.existsSync(uploadDirJob)) {
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Frontend URL
+  origin: ['https://freelanceapp-frontend.onrender.com', 'https://freelanceapp-backend.onrender.com','http://localhost:3000'], // Frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 app.use(express.json());
